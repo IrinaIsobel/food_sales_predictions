@@ -1,0 +1,83 @@
+{
+  "nbformat": 4,
+  "nbformat_minor": 0,
+  "metadata": {
+    "colab": {
+      "provenance": [],
+      "authorship_tag": "ABX9TyOV6SVI60ji0cT0gwpZ0adb",
+      "include_colab_link": true
+    },
+    "kernelspec": {
+      "name": "python3",
+      "display_name": "Python 3"
+    },
+    "language_info": {
+      "name": "python"
+    }
+  },
+  "cells": [
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "view-in-github",
+        "colab_type": "text"
+      },
+      "source": [
+        "<a href=\"https://colab.research.google.com/github/IrinaIsobel/food_sales_predictions/blob/main/outline\" target=\"_parent\"><img src=\"https://colab.research.google.com/assets/colab-badge.svg\" alt=\"Open In Colab\"/></a>"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "#Project 1 - Part 1\n",
+        "Irina Isobel Lukban"
+      ],
+      "metadata": {
+        "id": "jO70Jh-Fa6XW"
+      }
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "##Loading Data"
+      ],
+      "metadata": {
+        "id": "B-KJYMizbNo3"
+      }
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "##Data Cleaning"
+      ],
+      "metadata": {
+        "id": "IX8v6-RubP0W"
+      }
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "##Exploratory Visuals"
+      ],
+      "metadata": {
+        "id": "wumpjqCrbSF1"
+      }
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "##Explanatory Visuals"
+      ],
+      "metadata": {
+        "id": "YCZ__Am6bWEK"
+      }
+    },
+    {
+      "cell_type": "markdown",
+      "source": [],
+      "metadata": {
+        "id": "YkqxBMWRbdne"
+      }
+    }
+  ]
+}
