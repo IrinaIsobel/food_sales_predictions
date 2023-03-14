@@ -1,0 +1,2022 @@
+{
+  "nbformat": 4,
+  "nbformat_minor": 0,
+  "metadata": {
+    "colab": {
+      "provenance": [],
+      "authorship_tag": "ABX9TyNVVrPNZOtvgPWLc2aBCXuu",
+      "include_colab_link": true
+    },
+    "kernelspec": {
+      "name": "python3",
+      "display_name": "Python 3"
+    },
+    "language_info": {
+      "name": "python"
+    }
+  },
+  "cells": [
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "view-in-github",
+        "colab_type": "text"
+      },
+      "source": [
+        "<a href=\"https://colab.research.google.com/github/IrinaIsobel/food_sales_predictions/blob/main/machine_learning\" target=\"_parent\"><img src=\"https://colab.research.google.com/assets/colab-badge.svg\" alt=\"Open In Colab\"/></a>"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": 1,
+      "metadata": {
+        "id": "5ttMyxaktGQY"
+      },
+      "outputs": [],
+      "source": [
+        "import numpy as np\n",
+        "import pandas as pd"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "data = pd.read_csv('https://docs.google.com/spreadsheets/d/e/2PACX-1vSneA58lbwC6aQ6kDKUMgY7t3V_fVQkMF6n-wXIBWpvzHH20Rx0UDQYufcWhZ7TTdVUjrPwabuKua-C/pub?output=csv')\n",
+        "data.head()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 357
+        },
+        "id": "HXMquz44teNk",
+        "outputId": "f8e5e713-4288-4ed9-f877-e55be66ef589"
+      },
+      "execution_count": 2,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "  Item_Identifier  Item_Weight Item_Fat_Content  Item_Visibility  \\\n",
+              "0           FDA15         9.30          Low Fat         0.016047   \n",
+              "1           DRC01         5.92          Regular         0.019278   \n",
+              "2           FDN15        17.50          Low Fat         0.016760   \n",
+              "3           FDX07        19.20          Regular         0.000000   \n",
+              "4           NCD19         8.93          Low Fat         0.000000   \n",
+              "\n",
+              "               Item_Type  Item_MRP Outlet_Identifier  \\\n",
+              "0                  Dairy  249.8092            OUT049   \n",
+              "1            Soft Drinks   48.2692            OUT018   \n",
+              "2                   Meat  141.6180            OUT049   \n",
+              "3  Fruits and Vegetables  182.0950            OUT010   \n",
+              "4              Household   53.8614            OUT013   \n",
+              "\n",
+              "   Outlet_Establishment_Year Outlet_Size Outlet_Location_Type  \\\n",
+              "0                       1999      Medium               Tier 1   \n",
+              "1                       2009      Medium               Tier 3   \n",
+              "2                       1999      Medium               Tier 1   \n",
+              "3                       1998         NaN               Tier 3   \n",
+              "4                       1987        High               Tier 3   \n",
+              "\n",
+              "         Outlet_Type  Item_Outlet_Sales  \n",
+              "0  Supermarket Type1          3735.1380  \n",
+              "1  Supermarket Type2           443.4228  \n",
+              "2  Supermarket Type1          2097.2700  \n",
+              "3      Grocery Store           732.3800  \n",
+              "4  Supermarket Type1           994.7052  "
+            ],
+            "text/html": [
+              "\n",
+              "  <div id=\"df-56cabfff-7e75-4236-acd3-8c57c5521421\">\n",
+              "    <div class=\"colab-df-container\">\n",
+              "      <div>\n",
+              "<style scoped>\n",
+              "    .dataframe tbody tr th:only-of-type {\n",
+              "        vertical-align: middle;\n",
+              "    }\n",
+              "\n",
+              "    .dataframe tbody tr th {\n",
+              "        vertical-align: top;\n",
+              "    }\n",
+              "\n",
+              "    .dataframe thead th {\n",
+              "        text-align: right;\n",
+              "    }\n",
+              "</style>\n",
+              "<table border=\"1\" class=\"dataframe\">\n",
+              "  <thead>\n",
+              "    <tr style=\"text-align: right;\">\n",
+              "      <th></th>\n",
+              "      <th>Item_Identifier</th>\n",
+              "      <th>Item_Weight</th>\n",
+              "      <th>Item_Fat_Content</th>\n",
+              "      <th>Item_Visibility</th>\n",
+              "      <th>Item_Type</th>\n",
+              "      <th>Item_MRP</th>\n",
+              "      <th>Outlet_Identifier</th>\n",
+              "      <th>Outlet_Establishment_Year</th>\n",
+              "      <th>Outlet_Size</th>\n",
+              "      <th>Outlet_Location_Type</th>\n",
+              "      <th>Outlet_Type</th>\n",
+              "      <th>Item_Outlet_Sales</th>\n",
+              "    </tr>\n",
+              "  </thead>\n",
+              "  <tbody>\n",
+              "    <tr>\n",
+              "      <th>0</th>\n",
+              "      <td>FDA15</td>\n",
+              "      <td>9.30</td>\n",
+              "      <td>Low Fat</td>\n",
+              "      <td>0.016047</td>\n",
+              "      <td>Dairy</td>\n",
+              "      <td>249.8092</td>\n",
+              "      <td>OUT049</td>\n",
+              "      <td>1999</td>\n",
+              "      <td>Medium</td>\n",
+              "      <td>Tier 1</td>\n",
+              "      <td>Supermarket Type1</td>\n",
+              "      <td>3735.1380</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>1</th>\n",
+              "      <td>DRC01</td>\n",
+              "      <td>5.92</td>\n",
+              "      <td>Regular</td>\n",
+              "      <td>0.019278</td>\n",
+              "      <td>Soft Drinks</td>\n",
+              "      <td>48.2692</td>\n",
+              "      <td>OUT018</td>\n",
+              "      <td>2009</td>\n",
+              "      <td>Medium</td>\n",
+              "      <td>Tier 3</td>\n",
+              "      <td>Supermarket Type2</td>\n",
+              "      <td>443.4228</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>2</th>\n",
+              "      <td>FDN15</td>\n",
+              "      <td>17.50</td>\n",
+              "      <td>Low Fat</td>\n",
+              "      <td>0.016760</td>\n",
+              "      <td>Meat</td>\n",
+              "      <td>141.6180</td>\n",
+              "      <td>OUT049</td>\n",
+              "      <td>1999</td>\n",
+              "      <td>Medium</td>\n",
+              "      <td>Tier 1</td>\n",
+              "      <td>Supermarket Type1</td>\n",
+              "      <td>2097.2700</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>3</th>\n",
+              "      <td>FDX07</td>\n",
+              "      <td>19.20</td>\n",
+              "      <td>Regular</td>\n",
+              "      <td>0.000000</td>\n",
+              "      <td>Fruits and Vegetables</td>\n",
+              "      <td>182.0950</td>\n",
+              "      <td>OUT010</td>\n",
+              "      <td>1998</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>Tier 3</td>\n",
+              "      <td>Grocery Store</td>\n",
+              "      <td>732.3800</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>4</th>\n",
+              "      <td>NCD19</td>\n",
+              "      <td>8.93</td>\n",
+              "      <td>Low Fat</td>\n",
+              "      <td>0.000000</td>\n",
+              "      <td>Household</td>\n",
+              "      <td>53.8614</td>\n",
+              "      <td>OUT013</td>\n",
+              "      <td>1987</td>\n",
+              "      <td>High</td>\n",
+              "      <td>Tier 3</td>\n",
+              "      <td>Supermarket Type1</td>\n",
+              "      <td>994.7052</td>\n",
+              "    </tr>\n",
+              "  </tbody>\n",
+              "</table>\n",
+              "</div>\n",
+              "      <button class=\"colab-df-convert\" onclick=\"convertToInteractive('df-56cabfff-7e75-4236-acd3-8c57c5521421')\"\n",
+              "              title=\"Convert this dataframe to an interactive table.\"\n",
+              "              style=\"display:none;\">\n",
+              "        \n",
+              "  <svg xmlns=\"http://www.w3.org/2000/svg\" height=\"24px\"viewBox=\"0 0 24 24\"\n",
+              "       width=\"24px\">\n",
+              "    <path d=\"M0 0h24v24H0V0z\" fill=\"none\"/>\n",
+              "    <path d=\"M18.56 5.44l.94 2.06.94-2.06 2.06-.94-2.06-.94-.94-2.06-.94 2.06-2.06.94zm-11 1L8.5 8.5l.94-2.06 2.06-.94-2.06-.94L8.5 2.5l-.94 2.06-2.06.94zm10 10l.94 2.06.94-2.06 2.06-.94-2.06-.94-.94-2.06-.94 2.06-2.06.94z\"/><path d=\"M17.41 7.96l-1.37-1.37c-.4-.4-.92-.59-1.43-.59-.52 0-1.04.2-1.43.59L10.3 9.45l-7.72 7.72c-.78.78-.78 2.05 0 2.83L4 21.41c.39.39.9.59 1.41.59.51 0 1.02-.2 1.41-.59l7.78-7.78 2.81-2.81c.8-.78.8-2.07 0-2.86zM5.41 20L4 18.59l7.72-7.72 1.47 1.35L5.41 20z\"/>\n",
+              "  </svg>\n",
+              "      </button>\n",
+              "      \n",
+              "  <style>\n",
+              "    .colab-df-container {\n",
+              "      display:flex;\n",
+              "      flex-wrap:wrap;\n",
+              "      gap: 12px;\n",
+              "    }\n",
+              "\n",
+              "    .colab-df-convert {\n",
+              "      background-color: #E8F0FE;\n",
+              "      border: none;\n",
+              "      border-radius: 50%;\n",
+              "      cursor: pointer;\n",
+              "      display: none;\n",
+              "      fill: #1967D2;\n",
+              "      height: 32px;\n",
+              "      padding: 0 0 0 0;\n",
+              "      width: 32px;\n",
+              "    }\n",
+              "\n",
+              "    .colab-df-convert:hover {\n",
+              "      background-color: #E2EBFA;\n",
+              "      box-shadow: 0px 1px 2px rgba(60, 64, 67, 0.3), 0px 1px 3px 1px rgba(60, 64, 67, 0.15);\n",
+              "      fill: #174EA6;\n",
+              "    }\n",
+              "\n",
+              "    [theme=dark] .colab-df-convert {\n",
+              "      background-color: #3B4455;\n",
+              "      fill: #D2E3FC;\n",
+              "    }\n",
+              "\n",
+              "    [theme=dark] .colab-df-convert:hover {\n",
+              "      background-color: #434B5C;\n",
+              "      box-shadow: 0px 1px 3px 1px rgba(0, 0, 0, 0.15);\n",
+              "      filter: drop-shadow(0px 1px 2px rgba(0, 0, 0, 0.3));\n",
+              "      fill: #FFFFFF;\n",
+              "    }\n",
+              "  </style>\n",
+              "\n",
+              "      <script>\n",
+              "        const buttonEl =\n",
+              "          document.querySelector('#df-56cabfff-7e75-4236-acd3-8c57c5521421 button.colab-df-convert');\n",
+              "        buttonEl.style.display =\n",
+              "          google.colab.kernel.accessAllowed ? 'block' : 'none';\n",
+              "\n",
+              "        async function convertToInteractive(key) {\n",
+              "          const element = document.querySelector('#df-56cabfff-7e75-4236-acd3-8c57c5521421');\n",
+              "          const dataTable =\n",
+              "            await google.colab.kernel.invokeFunction('convertToInteractive',\n",
+              "                                                     [key], {});\n",
+              "          if (!dataTable) return;\n",
+              "\n",
+              "          const docLinkHtml = 'Like what you see? Visit the ' +\n",
+              "            '<a target=\"_blank\" href=https://colab.research.google.com/notebooks/data_table.ipynb>data table notebook</a>'\n",
+              "            + ' to learn more about interactive tables.';\n",
+              "          element.innerHTML = '';\n",
+              "          dataTable['output_type'] = 'display_data';\n",
+              "          await google.colab.output.renderOutput(dataTable, element);\n",
+              "          const docLink = document.createElement('div');\n",
+              "          docLink.innerHTML = docLinkHtml;\n",
+              "          element.appendChild(docLink);\n",
+              "        }\n",
+              "      </script>\n",
+              "    </div>\n",
+              "  </div>\n",
+              "  "
+            ]
+          },
+          "metadata": {},
+          "execution_count": 2
+        }
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "## Preprocessing Data"
+      ],
+      "metadata": {
+        "id": "e-tAxRXX-RtM"
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# Before splitting your data, you can drop duplicates and fix inconsistencies in categorical data.\n",
+        "\n",
+        "data.duplicated().sum()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "MNyCbszjtjQO",
+        "outputId": "f0da49ef-341d-4495-bd23-7b324a73caaa"
+      },
+      "execution_count": 3,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "0"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 3
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "data.info()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "if_gXiJmtvsi",
+        "outputId": "89849d9f-2aea-4c85-cb6c-2e6d5160da2e"
+      },
+      "execution_count": 4,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "<class 'pandas.core.frame.DataFrame'>\n",
+            "RangeIndex: 8523 entries, 0 to 8522\n",
+            "Data columns (total 12 columns):\n",
+            " #   Column                     Non-Null Count  Dtype  \n",
+            "---  ------                     --------------  -----  \n",
+            " 0   Item_Identifier            8523 non-null   object \n",
+            " 1   Item_Weight                7060 non-null   float64\n",
+            " 2   Item_Fat_Content           8523 non-null   object \n",
+            " 3   Item_Visibility            8523 non-null   float64\n",
+            " 4   Item_Type                  8523 non-null   object \n",
+            " 5   Item_MRP                   8523 non-null   float64\n",
+            " 6   Outlet_Identifier          8523 non-null   object \n",
+            " 7   Outlet_Establishment_Year  8523 non-null   int64  \n",
+            " 8   Outlet_Size                6113 non-null   object \n",
+            " 9   Outlet_Location_Type       8523 non-null   object \n",
+            " 10  Outlet_Type                8523 non-null   object \n",
+            " 11  Item_Outlet_Sales          8523 non-null   float64\n",
+            "dtypes: float64(4), int64(1), object(7)\n",
+            "memory usage: 799.2+ KB\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# Running a loop though categorical data to find and fix inconsistencies\n",
+        "\n",
+        "dtypes = data.dtypes\n",
+        "cat_col = dtypes[dtypes == 'object'].index\n",
+        "cat_col\n",
+        "\n",
+        "for cat in cat_col:\n",
+        "  print(data[cat].value_counts(dropna = False))\n",
+        "  print('\\n')"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "avdU6LD_14Qu",
+        "outputId": "983d9199-44e5-4b52-d329-4492ee5137c4"
+      },
+      "execution_count": 5,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "FDW13    10\n",
+            "FDG33    10\n",
+            "NCY18     9\n",
+            "FDD38     9\n",
+            "DRE49     9\n",
+            "         ..\n",
+            "FDY43     1\n",
+            "FDQ60     1\n",
+            "FDO33     1\n",
+            "DRF48     1\n",
+            "FDC23     1\n",
+            "Name: Item_Identifier, Length: 1559, dtype: int64\n",
+            "\n",
+            "\n",
+            "Low Fat    5089\n",
+            "Regular    2889\n",
+            "LF          316\n",
+            "reg         117\n",
+            "low fat     112\n",
+            "Name: Item_Fat_Content, dtype: int64\n",
+            "\n",
+            "\n",
+            "Fruits and Vegetables    1232\n",
+            "Snack Foods              1200\n",
+            "Household                 910\n",
+            "Frozen Foods              856\n",
+            "Dairy                     682\n",
+            "Canned                    649\n",
+            "Baking Goods              648\n",
+            "Health and Hygiene        520\n",
+            "Soft Drinks               445\n",
+            "Meat                      425\n",
+            "Breads                    251\n",
+            "Hard Drinks               214\n",
+            "Others                    169\n",
+            "Starchy Foods             148\n",
+            "Breakfast                 110\n",
+            "Seafood                    64\n",
+            "Name: Item_Type, dtype: int64\n",
+            "\n",
+            "\n",
+            "OUT027    935\n",
+            "OUT013    932\n",
+            "OUT049    930\n",
+            "OUT046    930\n",
+            "OUT035    930\n",
+            "OUT045    929\n",
+            "OUT018    928\n",
+            "OUT017    926\n",
+            "OUT010    555\n",
+            "OUT019    528\n",
+            "Name: Outlet_Identifier, dtype: int64\n",
+            "\n",
+            "\n",
+            "Medium    2793\n",
+            "NaN       2410\n",
+            "Small     2388\n",
+            "High       932\n",
+            "Name: Outlet_Size, dtype: int64\n",
+            "\n",
+            "\n",
+            "Tier 3    3350\n",
+            "Tier 2    2785\n",
+            "Tier 1    2388\n",
+            "Name: Outlet_Location_Type, dtype: int64\n",
+            "\n",
+            "\n",
+            "Supermarket Type1    5577\n",
+            "Grocery Store        1083\n",
+            "Supermarket Type3     935\n",
+            "Supermarket Type2     928\n",
+            "Name: Outlet_Type, dtype: int64\n",
+            "\n",
+            "\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "data['Item_Fat_Content'].value_counts()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "6uJa_DwNt4ul",
+        "outputId": "78147d95-6358-49cd-dde0-066ebb1b9e0f"
+      },
+      "execution_count": 6,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "Low Fat    5089\n",
+              "Regular    2889\n",
+              "LF          316\n",
+              "reg         117\n",
+              "low fat     112\n",
+              "Name: Item_Fat_Content, dtype: int64"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 6
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "data['Item_Fat_Content'].replace({'LF':'Low Fat', 'low fat':'Low Fat', 'reg':'Regular'}, inplace = True)\n",
+        "data['Item_Fat_Content'].value_counts()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "V16r2SqK02LN",
+        "outputId": "e92fb6c9-c0d6-42d1-cf5c-75a2a323e7de"
+      },
+      "execution_count": 7,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "Low Fat    5517\n",
+              "Regular    3006\n",
+              "Name: Item_Fat_Content, dtype: int64"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 7
+        }
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "- The data will now be split into a training set and a testing set to see how the model will work on new data."
+      ],
+      "metadata": {
+        "id": "fYhCsufCNsLa"
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# Identify the features (X) and target (y)\n",
+        "# Perform a train test split\n",
+        "\n",
+        "y = data['Item_Outlet_Sales']\n",
+        "X = data.drop(columns = ['Item_Outlet_Sales', 'Item_Identifier', 'Item_Weight'], axis = 1)\n",
+        "X.info()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "fcmNxoir1Tz0",
+        "outputId": "dbe88b18-1dc1-4f07-8fa5-d00595fc1457"
+      },
+      "execution_count": 8,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "<class 'pandas.core.frame.DataFrame'>\n",
+            "RangeIndex: 8523 entries, 0 to 8522\n",
+            "Data columns (total 9 columns):\n",
+            " #   Column                     Non-Null Count  Dtype  \n",
+            "---  ------                     --------------  -----  \n",
+            " 0   Item_Fat_Content           8523 non-null   object \n",
+            " 1   Item_Visibility            8523 non-null   float64\n",
+            " 2   Item_Type                  8523 non-null   object \n",
+            " 3   Item_MRP                   8523 non-null   float64\n",
+            " 4   Outlet_Identifier          8523 non-null   object \n",
+            " 5   Outlet_Establishment_Year  8523 non-null   int64  \n",
+            " 6   Outlet_Size                6113 non-null   object \n",
+            " 7   Outlet_Location_Type       8523 non-null   object \n",
+            " 8   Outlet_Type                8523 non-null   object \n",
+            "dtypes: float64(2), int64(1), object(6)\n",
+            "memory usage: 599.4+ KB\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "from sklearn.pipeline import make_pipeline\n",
+        "from sklearn.impute import SimpleImputer\n",
+        "from sklearn.preprocessing import StandardScaler, OneHotEncoder\n",
+        "from sklearn.model_selection import train_test_split\n",
+        "from sklearn.compose import make_column_selector, make_column_transformer\n",
+        "from sklearn import set_config\n",
+        "set_config(display='diagram')"
+      ],
+      "metadata": {
+        "id": "cZoqhbCe6Qed"
+      },
+      "execution_count": 9,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "X_train, X_test, y_train, y_test = train_test_split(X, y, random_state = 42)"
+      ],
+      "metadata": {
+        "id": "tvXYOc0N3Tm_"
+      },
+      "execution_count": 10,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "X.isna().sum()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "6y4eWvoy86l5",
+        "outputId": "e6b95ac6-de36-41b5-c274-ef6b8c7bef72"
+      },
+      "execution_count": 11,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "Item_Fat_Content                0\n",
+              "Item_Visibility                 0\n",
+              "Item_Type                       0\n",
+              "Item_MRP                        0\n",
+              "Outlet_Identifier               0\n",
+              "Outlet_Establishment_Year       0\n",
+              "Outlet_Size                  2410\n",
+              "Outlet_Location_Type            0\n",
+              "Outlet_Type                     0\n",
+              "dtype: int64"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 11
+        }
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "- To prepare dataset for machine learning, I am scaling numeric values and filling missing objects with the most frequently inputted value. After imputing missing values, I will turn object type data into numeric data. Everything will be done in pipeline processor.\n"
+      ],
+      "metadata": {
+        "id": "6Dhdt6Pl-oNW"
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# Create a preprocessing object to prepare the dataset for Machine Learning\n",
+        "# Replacing null values with the average of numerical columns and the most fequent of categorical columns\n",
+        "\n",
+        "cat_select = make_column_selector(dtype_include = 'object')\n",
+        "num_select = make_column_selector(dtype_include = 'number')\n",
+        "freq_impute = SimpleImputer(strategy = 'most_frequent')\n",
+        "mean_impute = SimpleImputer(strategy = 'mean')\n",
+        "scaler = StandardScaler()\n",
+        "ohe = OneHotEncoder(handle_unknown = 'ignore', sparse_output = False)"
+      ],
+      "metadata": {
+        "id": "aWx-BTR93UPo"
+      },
+      "execution_count": 12,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "cat_pipe = make_pipeline(freq_impute, ohe)\n",
+        "cat_pipe"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 126
+        },
+        "id": "O4xLNJIg8hcI",
+        "outputId": "80096654-87b2-497e-e7cc-3a9cd6e5fb44"
+      },
+      "execution_count": 13,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "Pipeline(steps=[('simpleimputer', SimpleImputer(strategy='most_frequent')),\n",
+              "                ('onehotencoder',\n",
+              "                 OneHotEncoder(handle_unknown='ignore', sparse_output=False))])"
+            ],
+            "text/html": [
+              "<style>#sk-container-id-1 {color: black;background-color: white;}#sk-container-id-1 pre{padding: 0;}#sk-container-id-1 div.sk-toggleable {background-color: white;}#sk-container-id-1 label.sk-toggleable__label {cursor: pointer;display: block;width: 100%;margin-bottom: 0;padding: 0.3em;box-sizing: border-box;text-align: center;}#sk-container-id-1 label.sk-toggleable__label-arrow:before {content: \"▸\";float: left;margin-right: 0.25em;color: #696969;}#sk-container-id-1 label.sk-toggleable__label-arrow:hover:before {color: black;}#sk-container-id-1 div.sk-estimator:hover label.sk-toggleable__label-arrow:before {color: black;}#sk-container-id-1 div.sk-toggleable__content {max-height: 0;max-width: 0;overflow: hidden;text-align: left;background-color: #f0f8ff;}#sk-container-id-1 div.sk-toggleable__content pre {margin: 0.2em;color: black;border-radius: 0.25em;background-color: #f0f8ff;}#sk-container-id-1 input.sk-toggleable__control:checked~div.sk-toggleable__content {max-height: 200px;max-width: 100%;overflow: auto;}#sk-container-id-1 input.sk-toggleable__control:checked~label.sk-toggleable__label-arrow:before {content: \"▾\";}#sk-container-id-1 div.sk-estimator input.sk-toggleable__control:checked~label.sk-toggleable__label {background-color: #d4ebff;}#sk-container-id-1 div.sk-label input.sk-toggleable__control:checked~label.sk-toggleable__label {background-color: #d4ebff;}#sk-container-id-1 input.sk-hidden--visually {border: 0;clip: rect(1px 1px 1px 1px);clip: rect(1px, 1px, 1px, 1px);height: 1px;margin: -1px;overflow: hidden;padding: 0;position: absolute;width: 1px;}#sk-container-id-1 div.sk-estimator {font-family: monospace;background-color: #f0f8ff;border: 1px dotted black;border-radius: 0.25em;box-sizing: border-box;margin-bottom: 0.5em;}#sk-container-id-1 div.sk-estimator:hover {background-color: #d4ebff;}#sk-container-id-1 div.sk-parallel-item::after {content: \"\";width: 100%;border-bottom: 1px solid gray;flex-grow: 1;}#sk-container-id-1 div.sk-label:hover label.sk-toggleable__label {background-color: #d4ebff;}#sk-container-id-1 div.sk-serial::before {content: \"\";position: absolute;border-left: 1px solid gray;box-sizing: border-box;top: 0;bottom: 0;left: 50%;z-index: 0;}#sk-container-id-1 div.sk-serial {display: flex;flex-direction: column;align-items: center;background-color: white;padding-right: 0.2em;padding-left: 0.2em;position: relative;}#sk-container-id-1 div.sk-item {position: relative;z-index: 1;}#sk-container-id-1 div.sk-parallel {display: flex;align-items: stretch;justify-content: center;background-color: white;position: relative;}#sk-container-id-1 div.sk-item::before, #sk-container-id-1 div.sk-parallel-item::before {content: \"\";position: absolute;border-left: 1px solid gray;box-sizing: border-box;top: 0;bottom: 0;left: 50%;z-index: -1;}#sk-container-id-1 div.sk-parallel-item {display: flex;flex-direction: column;z-index: 1;position: relative;background-color: white;}#sk-container-id-1 div.sk-parallel-item:first-child::after {align-self: flex-end;width: 50%;}#sk-container-id-1 div.sk-parallel-item:last-child::after {align-self: flex-start;width: 50%;}#sk-container-id-1 div.sk-parallel-item:only-child::after {width: 0;}#sk-container-id-1 div.sk-dashed-wrapped {border: 1px dashed gray;margin: 0 0.4em 0.5em 0.4em;box-sizing: border-box;padding-bottom: 0.4em;background-color: white;}#sk-container-id-1 div.sk-label label {font-family: monospace;font-weight: bold;display: inline-block;line-height: 1.2em;}#sk-container-id-1 div.sk-label-container {text-align: center;}#sk-container-id-1 div.sk-container {/* jupyter's `normalize.less` sets `[hidden] { display: none; }` but bootstrap.min.css set `[hidden] { display: none !important; }` so we also need the `!important` here to be able to override the default hidden behavior on the sphinx rendered scikit-learn.org. See: https://github.com/scikit-learn/scikit-learn/issues/21755 */display: inline-block !important;position: relative;}#sk-container-id-1 div.sk-text-repr-fallback {display: none;}</style><div id=\"sk-container-id-1\" class=\"sk-top-container\"><div class=\"sk-text-repr-fallback\"><pre>Pipeline(steps=[(&#x27;simpleimputer&#x27;, SimpleImputer(strategy=&#x27;most_frequent&#x27;)),\n",
+              "                (&#x27;onehotencoder&#x27;,\n",
+              "                 OneHotEncoder(handle_unknown=&#x27;ignore&#x27;, sparse_output=False))])</pre><b>In a Jupyter environment, please rerun this cell to show the HTML representation or trust the notebook. <br />On GitHub, the HTML representation is unable to render, please try loading this page with nbviewer.org.</b></div><div class=\"sk-container\" hidden><div class=\"sk-item sk-dashed-wrapped\"><div class=\"sk-label-container\"><div class=\"sk-label sk-toggleable\"><input class=\"sk-toggleable__control sk-hidden--visually\" id=\"sk-estimator-id-1\" type=\"checkbox\" ><label for=\"sk-estimator-id-1\" class=\"sk-toggleable__label sk-toggleable__label-arrow\">Pipeline</label><div class=\"sk-toggleable__content\"><pre>Pipeline(steps=[(&#x27;simpleimputer&#x27;, SimpleImputer(strategy=&#x27;most_frequent&#x27;)),\n",
+              "                (&#x27;onehotencoder&#x27;,\n",
+              "                 OneHotEncoder(handle_unknown=&#x27;ignore&#x27;, sparse_output=False))])</pre></div></div></div><div class=\"sk-serial\"><div class=\"sk-item\"><div class=\"sk-estimator sk-toggleable\"><input class=\"sk-toggleable__control sk-hidden--visually\" id=\"sk-estimator-id-2\" type=\"checkbox\" ><label for=\"sk-estimator-id-2\" class=\"sk-toggleable__label sk-toggleable__label-arrow\">SimpleImputer</label><div class=\"sk-toggleable__content\"><pre>SimpleImputer(strategy=&#x27;most_frequent&#x27;)</pre></div></div></div><div class=\"sk-item\"><div class=\"sk-estimator sk-toggleable\"><input class=\"sk-toggleable__control sk-hidden--visually\" id=\"sk-estimator-id-3\" type=\"checkbox\" ><label for=\"sk-estimator-id-3\" class=\"sk-toggleable__label sk-toggleable__label-arrow\">OneHotEncoder</label><div class=\"sk-toggleable__content\"><pre>OneHotEncoder(handle_unknown=&#x27;ignore&#x27;, sparse_output=False)</pre></div></div></div></div></div></div></div>"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 13
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "num_pipe = make_pipeline(mean_impute, scaler)\n",
+        "num_pipe"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 126
+        },
+        "id": "xUwFEYUd9Ytn",
+        "outputId": "7482fd42-22c3-4bf6-aa6b-c2c9a57fcea9"
+      },
+      "execution_count": 14,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "Pipeline(steps=[('simpleimputer', SimpleImputer()),\n",
+              "                ('standardscaler', StandardScaler())])"
+            ],
+            "text/html": [
+              "<style>#sk-container-id-2 {color: black;background-color: white;}#sk-container-id-2 pre{padding: 0;}#sk-container-id-2 div.sk-toggleable {background-color: white;}#sk-container-id-2 label.sk-toggleable__label {cursor: pointer;display: block;width: 100%;margin-bottom: 0;padding: 0.3em;box-sizing: border-box;text-align: center;}#sk-container-id-2 label.sk-toggleable__label-arrow:before {content: \"▸\";float: left;margin-right: 0.25em;color: #696969;}#sk-container-id-2 label.sk-toggleable__label-arrow:hover:before {color: black;}#sk-container-id-2 div.sk-estimator:hover label.sk-toggleable__label-arrow:before {color: black;}#sk-container-id-2 div.sk-toggleable__content {max-height: 0;max-width: 0;overflow: hidden;text-align: left;background-color: #f0f8ff;}#sk-container-id-2 div.sk-toggleable__content pre {margin: 0.2em;color: black;border-radius: 0.25em;background-color: #f0f8ff;}#sk-container-id-2 input.sk-toggleable__control:checked~div.sk-toggleable__content {max-height: 200px;max-width: 100%;overflow: auto;}#sk-container-id-2 input.sk-toggleable__control:checked~label.sk-toggleable__label-arrow:before {content: \"▾\";}#sk-container-id-2 div.sk-estimator input.sk-toggleable__control:checked~label.sk-toggleable__label {background-color: #d4ebff;}#sk-container-id-2 div.sk-label input.sk-toggleable__control:checked~label.sk-toggleable__label {background-color: #d4ebff;}#sk-container-id-2 input.sk-hidden--visually {border: 0;clip: rect(1px 1px 1px 1px);clip: rect(1px, 1px, 1px, 1px);height: 1px;margin: -1px;overflow: hidden;padding: 0;position: absolute;width: 1px;}#sk-container-id-2 div.sk-estimator {font-family: monospace;background-color: #f0f8ff;border: 1px dotted black;border-radius: 0.25em;box-sizing: border-box;margin-bottom: 0.5em;}#sk-container-id-2 div.sk-estimator:hover {background-color: #d4ebff;}#sk-container-id-2 div.sk-parallel-item::after {content: \"\";width: 100%;border-bottom: 1px solid gray;flex-grow: 1;}#sk-container-id-2 div.sk-label:hover label.sk-toggleable__label {background-color: #d4ebff;}#sk-container-id-2 div.sk-serial::before {content: \"\";position: absolute;border-left: 1px solid gray;box-sizing: border-box;top: 0;bottom: 0;left: 50%;z-index: 0;}#sk-container-id-2 div.sk-serial {display: flex;flex-direction: column;align-items: center;background-color: white;padding-right: 0.2em;padding-left: 0.2em;position: relative;}#sk-container-id-2 div.sk-item {position: relative;z-index: 1;}#sk-container-id-2 div.sk-parallel {display: flex;align-items: stretch;justify-content: center;background-color: white;position: relative;}#sk-container-id-2 div.sk-item::before, #sk-container-id-2 div.sk-parallel-item::before {content: \"\";position: absolute;border-left: 1px solid gray;box-sizing: border-box;top: 0;bottom: 0;left: 50%;z-index: -1;}#sk-container-id-2 div.sk-parallel-item {display: flex;flex-direction: column;z-index: 1;position: relative;background-color: white;}#sk-container-id-2 div.sk-parallel-item:first-child::after {align-self: flex-end;width: 50%;}#sk-container-id-2 div.sk-parallel-item:last-child::after {align-self: flex-start;width: 50%;}#sk-container-id-2 div.sk-parallel-item:only-child::after {width: 0;}#sk-container-id-2 div.sk-dashed-wrapped {border: 1px dashed gray;margin: 0 0.4em 0.5em 0.4em;box-sizing: border-box;padding-bottom: 0.4em;background-color: white;}#sk-container-id-2 div.sk-label label {font-family: monospace;font-weight: bold;display: inline-block;line-height: 1.2em;}#sk-container-id-2 div.sk-label-container {text-align: center;}#sk-container-id-2 div.sk-container {/* jupyter's `normalize.less` sets `[hidden] { display: none; }` but bootstrap.min.css set `[hidden] { display: none !important; }` so we also need the `!important` here to be able to override the default hidden behavior on the sphinx rendered scikit-learn.org. See: https://github.com/scikit-learn/scikit-learn/issues/21755 */display: inline-block !important;position: relative;}#sk-container-id-2 div.sk-text-repr-fallback {display: none;}</style><div id=\"sk-container-id-2\" class=\"sk-top-container\"><div class=\"sk-text-repr-fallback\"><pre>Pipeline(steps=[(&#x27;simpleimputer&#x27;, SimpleImputer()),\n",
+              "                (&#x27;standardscaler&#x27;, StandardScaler())])</pre><b>In a Jupyter environment, please rerun this cell to show the HTML representation or trust the notebook. <br />On GitHub, the HTML representation is unable to render, please try loading this page with nbviewer.org.</b></div><div class=\"sk-container\" hidden><div class=\"sk-item sk-dashed-wrapped\"><div class=\"sk-label-container\"><div class=\"sk-label sk-toggleable\"><input class=\"sk-toggleable__control sk-hidden--visually\" id=\"sk-estimator-id-4\" type=\"checkbox\" ><label for=\"sk-estimator-id-4\" class=\"sk-toggleable__label sk-toggleable__label-arrow\">Pipeline</label><div class=\"sk-toggleable__content\"><pre>Pipeline(steps=[(&#x27;simpleimputer&#x27;, SimpleImputer()),\n",
+              "                (&#x27;standardscaler&#x27;, StandardScaler())])</pre></div></div></div><div class=\"sk-serial\"><div class=\"sk-item\"><div class=\"sk-estimator sk-toggleable\"><input class=\"sk-toggleable__control sk-hidden--visually\" id=\"sk-estimator-id-5\" type=\"checkbox\" ><label for=\"sk-estimator-id-5\" class=\"sk-toggleable__label sk-toggleable__label-arrow\">SimpleImputer</label><div class=\"sk-toggleable__content\"><pre>SimpleImputer()</pre></div></div></div><div class=\"sk-item\"><div class=\"sk-estimator sk-toggleable\"><input class=\"sk-toggleable__control sk-hidden--visually\" id=\"sk-estimator-id-6\" type=\"checkbox\" ><label for=\"sk-estimator-id-6\" class=\"sk-toggleable__label sk-toggleable__label-arrow\">StandardScaler</label><div class=\"sk-toggleable__content\"><pre>StandardScaler()</pre></div></div></div></div></div></div></div>"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 14
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "num_tup = (num_pipe, num_select)\n",
+        "cat_tup = (cat_pipe, cat_select)\n",
+        "preproc = make_column_transformer(num_tup, cat_tup)\n",
+        "preproc"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 152
+        },
+        "id": "Tn2yFsm-9_47",
+        "outputId": "13023e1a-b0a9-4cc9-b639-41753c316215"
+      },
+      "execution_count": 15,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "ColumnTransformer(transformers=[('pipeline-1',\n",
+              "                                 Pipeline(steps=[('simpleimputer',\n",
+              "                                                  SimpleImputer()),\n",
+              "                                                 ('standardscaler',\n",
+              "                                                  StandardScaler())]),\n",
+              "                                 <sklearn.compose._column_transformer.make_column_selector object at 0x7f099c5abb80>),\n",
+              "                                ('pipeline-2',\n",
+              "                                 Pipeline(steps=[('simpleimputer',\n",
+              "                                                  SimpleImputer(strategy='most_frequent')),\n",
+              "                                                 ('onehotencoder',\n",
+              "                                                  OneHotEncoder(handle_unknown='ignore',\n",
+              "                                                                sparse_output=False))]),\n",
+              "                                 <sklearn.compose._column_transformer.make_column_selector object at 0x7f099c5abdc0>)])"
+            ],
+            "text/html": [
+              "<style>#sk-container-id-3 {color: black;background-color: white;}#sk-container-id-3 pre{padding: 0;}#sk-container-id-3 div.sk-toggleable {background-color: white;}#sk-container-id-3 label.sk-toggleable__label {cursor: pointer;display: block;width: 100%;margin-bottom: 0;padding: 0.3em;box-sizing: border-box;text-align: center;}#sk-container-id-3 label.sk-toggleable__label-arrow:before {content: \"▸\";float: left;margin-right: 0.25em;color: #696969;}#sk-container-id-3 label.sk-toggleable__label-arrow:hover:before {color: black;}#sk-container-id-3 div.sk-estimator:hover label.sk-toggleable__label-arrow:before {color: black;}#sk-container-id-3 div.sk-toggleable__content {max-height: 0;max-width: 0;overflow: hidden;text-align: left;background-color: #f0f8ff;}#sk-container-id-3 div.sk-toggleable__content pre {margin: 0.2em;color: black;border-radius: 0.25em;background-color: #f0f8ff;}#sk-container-id-3 input.sk-toggleable__control:checked~div.sk-toggleable__content {max-height: 200px;max-width: 100%;overflow: auto;}#sk-container-id-3 input.sk-toggleable__control:checked~label.sk-toggleable__label-arrow:before {content: \"▾\";}#sk-container-id-3 div.sk-estimator input.sk-toggleable__control:checked~label.sk-toggleable__label {background-color: #d4ebff;}#sk-container-id-3 div.sk-label input.sk-toggleable__control:checked~label.sk-toggleable__label {background-color: #d4ebff;}#sk-container-id-3 input.sk-hidden--visually {border: 0;clip: rect(1px 1px 1px 1px);clip: rect(1px, 1px, 1px, 1px);height: 1px;margin: -1px;overflow: hidden;padding: 0;position: absolute;width: 1px;}#sk-container-id-3 div.sk-estimator {font-family: monospace;background-color: #f0f8ff;border: 1px dotted black;border-radius: 0.25em;box-sizing: border-box;margin-bottom: 0.5em;}#sk-container-id-3 div.sk-estimator:hover {background-color: #d4ebff;}#sk-container-id-3 div.sk-parallel-item::after {content: \"\";width: 100%;border-bottom: 1px solid gray;flex-grow: 1;}#sk-container-id-3 div.sk-label:hover label.sk-toggleable__label {background-color: #d4ebff;}#sk-container-id-3 div.sk-serial::before {content: \"\";position: absolute;border-left: 1px solid gray;box-sizing: border-box;top: 0;bottom: 0;left: 50%;z-index: 0;}#sk-container-id-3 div.sk-serial {display: flex;flex-direction: column;align-items: center;background-color: white;padding-right: 0.2em;padding-left: 0.2em;position: relative;}#sk-container-id-3 div.sk-item {position: relative;z-index: 1;}#sk-container-id-3 div.sk-parallel {display: flex;align-items: stretch;justify-content: center;background-color: white;position: relative;}#sk-container-id-3 div.sk-item::before, #sk-container-id-3 div.sk-parallel-item::before {content: \"\";position: absolute;border-left: 1px solid gray;box-sizing: border-box;top: 0;bottom: 0;left: 50%;z-index: -1;}#sk-container-id-3 div.sk-parallel-item {display: flex;flex-direction: column;z-index: 1;position: relative;background-color: white;}#sk-container-id-3 div.sk-parallel-item:first-child::after {align-self: flex-end;width: 50%;}#sk-container-id-3 div.sk-parallel-item:last-child::after {align-self: flex-start;width: 50%;}#sk-container-id-3 div.sk-parallel-item:only-child::after {width: 0;}#sk-container-id-3 div.sk-dashed-wrapped {border: 1px dashed gray;margin: 0 0.4em 0.5em 0.4em;box-sizing: border-box;padding-bottom: 0.4em;background-color: white;}#sk-container-id-3 div.sk-label label {font-family: monospace;font-weight: bold;display: inline-block;line-height: 1.2em;}#sk-container-id-3 div.sk-label-container {text-align: center;}#sk-container-id-3 div.sk-container {/* jupyter's `normalize.less` sets `[hidden] { display: none; }` but bootstrap.min.css set `[hidden] { display: none !important; }` so we also need the `!important` here to be able to override the default hidden behavior on the sphinx rendered scikit-learn.org. See: https://github.com/scikit-learn/scikit-learn/issues/21755 */display: inline-block !important;position: relative;}#sk-container-id-3 div.sk-text-repr-fallback {display: none;}</style><div id=\"sk-container-id-3\" class=\"sk-top-container\"><div class=\"sk-text-repr-fallback\"><pre>ColumnTransformer(transformers=[(&#x27;pipeline-1&#x27;,\n",
+              "                                 Pipeline(steps=[(&#x27;simpleimputer&#x27;,\n",
+              "                                                  SimpleImputer()),\n",
+              "                                                 (&#x27;standardscaler&#x27;,\n",
+              "                                                  StandardScaler())]),\n",
+              "                                 &lt;sklearn.compose._column_transformer.make_column_selector object at 0x7f099c5abb80&gt;),\n",
+              "                                (&#x27;pipeline-2&#x27;,\n",
+              "                                 Pipeline(steps=[(&#x27;simpleimputer&#x27;,\n",
+              "                                                  SimpleImputer(strategy=&#x27;most_frequent&#x27;)),\n",
+              "                                                 (&#x27;onehotencoder&#x27;,\n",
+              "                                                  OneHotEncoder(handle_unknown=&#x27;ignore&#x27;,\n",
+              "                                                                sparse_output=False))]),\n",
+              "                                 &lt;sklearn.compose._column_transformer.make_column_selector object at 0x7f099c5abdc0&gt;)])</pre><b>In a Jupyter environment, please rerun this cell to show the HTML representation or trust the notebook. <br />On GitHub, the HTML representation is unable to render, please try loading this page with nbviewer.org.</b></div><div class=\"sk-container\" hidden><div class=\"sk-item sk-dashed-wrapped\"><div class=\"sk-label-container\"><div class=\"sk-label sk-toggleable\"><input class=\"sk-toggleable__control sk-hidden--visually\" id=\"sk-estimator-id-7\" type=\"checkbox\" ><label for=\"sk-estimator-id-7\" class=\"sk-toggleable__label sk-toggleable__label-arrow\">ColumnTransformer</label><div class=\"sk-toggleable__content\"><pre>ColumnTransformer(transformers=[(&#x27;pipeline-1&#x27;,\n",
+              "                                 Pipeline(steps=[(&#x27;simpleimputer&#x27;,\n",
+              "                                                  SimpleImputer()),\n",
+              "                                                 (&#x27;standardscaler&#x27;,\n",
+              "                                                  StandardScaler())]),\n",
+              "                                 &lt;sklearn.compose._column_transformer.make_column_selector object at 0x7f099c5abb80&gt;),\n",
+              "                                (&#x27;pipeline-2&#x27;,\n",
+              "                                 Pipeline(steps=[(&#x27;simpleimputer&#x27;,\n",
+              "                                                  SimpleImputer(strategy=&#x27;most_frequent&#x27;)),\n",
+              "                                                 (&#x27;onehotencoder&#x27;,\n",
+              "                                                  OneHotEncoder(handle_unknown=&#x27;ignore&#x27;,\n",
+              "                                                                sparse_output=False))]),\n",
+              "                                 &lt;sklearn.compose._column_transformer.make_column_selector object at 0x7f099c5abdc0&gt;)])</pre></div></div></div><div class=\"sk-parallel\"><div class=\"sk-parallel-item\"><div class=\"sk-item\"><div class=\"sk-label-container\"><div class=\"sk-label sk-toggleable\"><input class=\"sk-toggleable__control sk-hidden--visually\" id=\"sk-estimator-id-8\" type=\"checkbox\" ><label for=\"sk-estimator-id-8\" class=\"sk-toggleable__label sk-toggleable__label-arrow\">pipeline-1</label><div class=\"sk-toggleable__content\"><pre>&lt;sklearn.compose._column_transformer.make_column_selector object at 0x7f099c5abb80&gt;</pre></div></div></div><div class=\"sk-serial\"><div class=\"sk-item\"><div class=\"sk-serial\"><div class=\"sk-item\"><div class=\"sk-estimator sk-toggleable\"><input class=\"sk-toggleable__control sk-hidden--visually\" id=\"sk-estimator-id-9\" type=\"checkbox\" ><label for=\"sk-estimator-id-9\" class=\"sk-toggleable__label sk-toggleable__label-arrow\">SimpleImputer</label><div class=\"sk-toggleable__content\"><pre>SimpleImputer()</pre></div></div></div><div class=\"sk-item\"><div class=\"sk-estimator sk-toggleable\"><input class=\"sk-toggleable__control sk-hidden--visually\" id=\"sk-estimator-id-10\" type=\"checkbox\" ><label for=\"sk-estimator-id-10\" class=\"sk-toggleable__label sk-toggleable__label-arrow\">StandardScaler</label><div class=\"sk-toggleable__content\"><pre>StandardScaler()</pre></div></div></div></div></div></div></div></div><div class=\"sk-parallel-item\"><div class=\"sk-item\"><div class=\"sk-label-container\"><div class=\"sk-label sk-toggleable\"><input class=\"sk-toggleable__control sk-hidden--visually\" id=\"sk-estimator-id-11\" type=\"checkbox\" ><label for=\"sk-estimator-id-11\" class=\"sk-toggleable__label sk-toggleable__label-arrow\">pipeline-2</label><div class=\"sk-toggleable__content\"><pre>&lt;sklearn.compose._column_transformer.make_column_selector object at 0x7f099c5abdc0&gt;</pre></div></div></div><div class=\"sk-serial\"><div class=\"sk-item\"><div class=\"sk-serial\"><div class=\"sk-item\"><div class=\"sk-estimator sk-toggleable\"><input class=\"sk-toggleable__control sk-hidden--visually\" id=\"sk-estimator-id-12\" type=\"checkbox\" ><label for=\"sk-estimator-id-12\" class=\"sk-toggleable__label sk-toggleable__label-arrow\">SimpleImputer</label><div class=\"sk-toggleable__content\"><pre>SimpleImputer(strategy=&#x27;most_frequent&#x27;)</pre></div></div></div><div class=\"sk-item\"><div class=\"sk-estimator sk-toggleable\"><input class=\"sk-toggleable__control sk-hidden--visually\" id=\"sk-estimator-id-13\" type=\"checkbox\" ><label for=\"sk-estimator-id-13\" class=\"sk-toggleable__label sk-toggleable__label-arrow\">OneHotEncoder</label><div class=\"sk-toggleable__content\"><pre>OneHotEncoder(handle_unknown=&#x27;ignore&#x27;, sparse_output=False)</pre></div></div></div></div></div></div></div></div></div></div></div></div>"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 15
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "preproc.fit(X_train)"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 152
+        },
+        "id": "z1VcpEyh-Lg0",
+        "outputId": "87a88b89-fefc-466c-e476-1148b05eafff"
+      },
+      "execution_count": 16,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "ColumnTransformer(transformers=[('pipeline-1',\n",
+              "                                 Pipeline(steps=[('simpleimputer',\n",
+              "                                                  SimpleImputer()),\n",
+              "                                                 ('standardscaler',\n",
+              "                                                  StandardScaler())]),\n",
+              "                                 <sklearn.compose._column_transformer.make_column_selector object at 0x7f099c5abb80>),\n",
+              "                                ('pipeline-2',\n",
+              "                                 Pipeline(steps=[('simpleimputer',\n",
+              "                                                  SimpleImputer(strategy='most_frequent')),\n",
+              "                                                 ('onehotencoder',\n",
+              "                                                  OneHotEncoder(handle_unknown='ignore',\n",
+              "                                                                sparse_output=False))]),\n",
+              "                                 <sklearn.compose._column_transformer.make_column_selector object at 0x7f099c5abdc0>)])"
+            ],
+            "text/html": [
+              "<style>#sk-container-id-4 {color: black;background-color: white;}#sk-container-id-4 pre{padding: 0;}#sk-container-id-4 div.sk-toggleable {background-color: white;}#sk-container-id-4 label.sk-toggleable__label {cursor: pointer;display: block;width: 100%;margin-bottom: 0;padding: 0.3em;box-sizing: border-box;text-align: center;}#sk-container-id-4 label.sk-toggleable__label-arrow:before {content: \"▸\";float: left;margin-right: 0.25em;color: #696969;}#sk-container-id-4 label.sk-toggleable__label-arrow:hover:before {color: black;}#sk-container-id-4 div.sk-estimator:hover label.sk-toggleable__label-arrow:before {color: black;}#sk-container-id-4 div.sk-toggleable__content {max-height: 0;max-width: 0;overflow: hidden;text-align: left;background-color: #f0f8ff;}#sk-container-id-4 div.sk-toggleable__content pre {margin: 0.2em;color: black;border-radius: 0.25em;background-color: #f0f8ff;}#sk-container-id-4 input.sk-toggleable__control:checked~div.sk-toggleable__content {max-height: 200px;max-width: 100%;overflow: auto;}#sk-container-id-4 input.sk-toggleable__control:checked~label.sk-toggleable__label-arrow:before {content: \"▾\";}#sk-container-id-4 div.sk-estimator input.sk-toggleable__control:checked~label.sk-toggleable__label {background-color: #d4ebff;}#sk-container-id-4 div.sk-label input.sk-toggleable__control:checked~label.sk-toggleable__label {background-color: #d4ebff;}#sk-container-id-4 input.sk-hidden--visually {border: 0;clip: rect(1px 1px 1px 1px);clip: rect(1px, 1px, 1px, 1px);height: 1px;margin: -1px;overflow: hidden;padding: 0;position: absolute;width: 1px;}#sk-container-id-4 div.sk-estimator {font-family: monospace;background-color: #f0f8ff;border: 1px dotted black;border-radius: 0.25em;box-sizing: border-box;margin-bottom: 0.5em;}#sk-container-id-4 div.sk-estimator:hover {background-color: #d4ebff;}#sk-container-id-4 div.sk-parallel-item::after {content: \"\";width: 100%;border-bottom: 1px solid gray;flex-grow: 1;}#sk-container-id-4 div.sk-label:hover label.sk-toggleable__label {background-color: #d4ebff;}#sk-container-id-4 div.sk-serial::before {content: \"\";position: absolute;border-left: 1px solid gray;box-sizing: border-box;top: 0;bottom: 0;left: 50%;z-index: 0;}#sk-container-id-4 div.sk-serial {display: flex;flex-direction: column;align-items: center;background-color: white;padding-right: 0.2em;padding-left: 0.2em;position: relative;}#sk-container-id-4 div.sk-item {position: relative;z-index: 1;}#sk-container-id-4 div.sk-parallel {display: flex;align-items: stretch;justify-content: center;background-color: white;position: relative;}#sk-container-id-4 div.sk-item::before, #sk-container-id-4 div.sk-parallel-item::before {content: \"\";position: absolute;border-left: 1px solid gray;box-sizing: border-box;top: 0;bottom: 0;left: 50%;z-index: -1;}#sk-container-id-4 div.sk-parallel-item {display: flex;flex-direction: column;z-index: 1;position: relative;background-color: white;}#sk-container-id-4 div.sk-parallel-item:first-child::after {align-self: flex-end;width: 50%;}#sk-container-id-4 div.sk-parallel-item:last-child::after {align-self: flex-start;width: 50%;}#sk-container-id-4 div.sk-parallel-item:only-child::after {width: 0;}#sk-container-id-4 div.sk-dashed-wrapped {border: 1px dashed gray;margin: 0 0.4em 0.5em 0.4em;box-sizing: border-box;padding-bottom: 0.4em;background-color: white;}#sk-container-id-4 div.sk-label label {font-family: monospace;font-weight: bold;display: inline-block;line-height: 1.2em;}#sk-container-id-4 div.sk-label-container {text-align: center;}#sk-container-id-4 div.sk-container {/* jupyter's `normalize.less` sets `[hidden] { display: none; }` but bootstrap.min.css set `[hidden] { display: none !important; }` so we also need the `!important` here to be able to override the default hidden behavior on the sphinx rendered scikit-learn.org. See: https://github.com/scikit-learn/scikit-learn/issues/21755 */display: inline-block !important;position: relative;}#sk-container-id-4 div.sk-text-repr-fallback {display: none;}</style><div id=\"sk-container-id-4\" class=\"sk-top-container\"><div class=\"sk-text-repr-fallback\"><pre>ColumnTransformer(transformers=[(&#x27;pipeline-1&#x27;,\n",
+              "                                 Pipeline(steps=[(&#x27;simpleimputer&#x27;,\n",
+              "                                                  SimpleImputer()),\n",
+              "                                                 (&#x27;standardscaler&#x27;,\n",
+              "                                                  StandardScaler())]),\n",
+              "                                 &lt;sklearn.compose._column_transformer.make_column_selector object at 0x7f099c5abb80&gt;),\n",
+              "                                (&#x27;pipeline-2&#x27;,\n",
+              "                                 Pipeline(steps=[(&#x27;simpleimputer&#x27;,\n",
+              "                                                  SimpleImputer(strategy=&#x27;most_frequent&#x27;)),\n",
+              "                                                 (&#x27;onehotencoder&#x27;,\n",
+              "                                                  OneHotEncoder(handle_unknown=&#x27;ignore&#x27;,\n",
+              "                                                                sparse_output=False))]),\n",
+              "                                 &lt;sklearn.compose._column_transformer.make_column_selector object at 0x7f099c5abdc0&gt;)])</pre><b>In a Jupyter environment, please rerun this cell to show the HTML representation or trust the notebook. <br />On GitHub, the HTML representation is unable to render, please try loading this page with nbviewer.org.</b></div><div class=\"sk-container\" hidden><div class=\"sk-item sk-dashed-wrapped\"><div class=\"sk-label-container\"><div class=\"sk-label sk-toggleable\"><input class=\"sk-toggleable__control sk-hidden--visually\" id=\"sk-estimator-id-14\" type=\"checkbox\" ><label for=\"sk-estimator-id-14\" class=\"sk-toggleable__label sk-toggleable__label-arrow\">ColumnTransformer</label><div class=\"sk-toggleable__content\"><pre>ColumnTransformer(transformers=[(&#x27;pipeline-1&#x27;,\n",
+              "                                 Pipeline(steps=[(&#x27;simpleimputer&#x27;,\n",
+              "                                                  SimpleImputer()),\n",
+              "                                                 (&#x27;standardscaler&#x27;,\n",
+              "                                                  StandardScaler())]),\n",
+              "                                 &lt;sklearn.compose._column_transformer.make_column_selector object at 0x7f099c5abb80&gt;),\n",
+              "                                (&#x27;pipeline-2&#x27;,\n",
+              "                                 Pipeline(steps=[(&#x27;simpleimputer&#x27;,\n",
+              "                                                  SimpleImputer(strategy=&#x27;most_frequent&#x27;)),\n",
+              "                                                 (&#x27;onehotencoder&#x27;,\n",
+              "                                                  OneHotEncoder(handle_unknown=&#x27;ignore&#x27;,\n",
+              "                                                                sparse_output=False))]),\n",
+              "                                 &lt;sklearn.compose._column_transformer.make_column_selector object at 0x7f099c5abdc0&gt;)])</pre></div></div></div><div class=\"sk-parallel\"><div class=\"sk-parallel-item\"><div class=\"sk-item\"><div class=\"sk-label-container\"><div class=\"sk-label sk-toggleable\"><input class=\"sk-toggleable__control sk-hidden--visually\" id=\"sk-estimator-id-15\" type=\"checkbox\" ><label for=\"sk-estimator-id-15\" class=\"sk-toggleable__label sk-toggleable__label-arrow\">pipeline-1</label><div class=\"sk-toggleable__content\"><pre>&lt;sklearn.compose._column_transformer.make_column_selector object at 0x7f099c5abb80&gt;</pre></div></div></div><div class=\"sk-serial\"><div class=\"sk-item\"><div class=\"sk-serial\"><div class=\"sk-item\"><div class=\"sk-estimator sk-toggleable\"><input class=\"sk-toggleable__control sk-hidden--visually\" id=\"sk-estimator-id-16\" type=\"checkbox\" ><label for=\"sk-estimator-id-16\" class=\"sk-toggleable__label sk-toggleable__label-arrow\">SimpleImputer</label><div class=\"sk-toggleable__content\"><pre>SimpleImputer()</pre></div></div></div><div class=\"sk-item\"><div class=\"sk-estimator sk-toggleable\"><input class=\"sk-toggleable__control sk-hidden--visually\" id=\"sk-estimator-id-17\" type=\"checkbox\" ><label for=\"sk-estimator-id-17\" class=\"sk-toggleable__label sk-toggleable__label-arrow\">StandardScaler</label><div class=\"sk-toggleable__content\"><pre>StandardScaler()</pre></div></div></div></div></div></div></div></div><div class=\"sk-parallel-item\"><div class=\"sk-item\"><div class=\"sk-label-container\"><div class=\"sk-label sk-toggleable\"><input class=\"sk-toggleable__control sk-hidden--visually\" id=\"sk-estimator-id-18\" type=\"checkbox\" ><label for=\"sk-estimator-id-18\" class=\"sk-toggleable__label sk-toggleable__label-arrow\">pipeline-2</label><div class=\"sk-toggleable__content\"><pre>&lt;sklearn.compose._column_transformer.make_column_selector object at 0x7f099c5abdc0&gt;</pre></div></div></div><div class=\"sk-serial\"><div class=\"sk-item\"><div class=\"sk-serial\"><div class=\"sk-item\"><div class=\"sk-estimator sk-toggleable\"><input class=\"sk-toggleable__control sk-hidden--visually\" id=\"sk-estimator-id-19\" type=\"checkbox\" ><label for=\"sk-estimator-id-19\" class=\"sk-toggleable__label sk-toggleable__label-arrow\">SimpleImputer</label><div class=\"sk-toggleable__content\"><pre>SimpleImputer(strategy=&#x27;most_frequent&#x27;)</pre></div></div></div><div class=\"sk-item\"><div class=\"sk-estimator sk-toggleable\"><input class=\"sk-toggleable__control sk-hidden--visually\" id=\"sk-estimator-id-20\" type=\"checkbox\" ><label for=\"sk-estimator-id-20\" class=\"sk-toggleable__label sk-toggleable__label-arrow\">OneHotEncoder</label><div class=\"sk-toggleable__content\"><pre>OneHotEncoder(handle_unknown=&#x27;ignore&#x27;, sparse_output=False)</pre></div></div></div></div></div></div></div></div></div></div></div></div>"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 16
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "X_train_proc = preproc.transform(X_train)\n",
+        "X_test_proc = preproc.transform(X_test)"
+      ],
+      "metadata": {
+        "id": "fA8S5QKI-QJx"
+      },
+      "execution_count": 17,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "print(np.isnan(X_train_proc).sum(), 'missing values in training data')\n",
+        "print('All data in X_train_proc are', X_train_proc.dtype)\n",
+        "\n",
+        "print('\\n')\n",
+        "\n",
+        "print(np.isnan(X_test_proc).sum(), 'missing values in testing data')\n",
+        "print('All data in X_test_proc are', X_test_proc.dtype)\n",
+        "\n",
+        "print('\\n')\n",
+        "X_train_proc"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "rEojzl2m-SC1",
+        "outputId": "1da8cb22-8aec-457e-bc61-06d485001022"
+      },
+      "execution_count": 18,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "0 missing values in training data\n",
+            "All data in X_train_proc are float64\n",
+            "\n",
+            "\n",
+            "0 missing values in testing data\n",
+            "All data in X_test_proc are float64\n",
+            "\n",
+            "\n"
+          ]
+        },
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "array([[-0.71277507,  1.82810922,  1.32784893, ...,  0.        ,\n",
+              "         1.        ,  0.        ],\n",
+              "       [-1.29105225,  0.60336888,  1.32784893, ...,  0.        ,\n",
+              "         1.        ,  0.        ],\n",
+              "       [ 1.81331864,  0.24454056,  0.13618724, ...,  1.        ,\n",
+              "         0.        ,  0.        ],\n",
+              "       ...,\n",
+              "       [-0.92052713,  1.52302674,  0.49368575, ...,  1.        ,\n",
+              "         0.        ,  0.        ],\n",
+              "       [-0.2277552 , -0.38377708,  1.0895166 , ...,  1.        ,\n",
+              "         0.        ,  0.        ],\n",
+              "       [-0.95867683, -0.73836105, -0.10214509, ...,  1.        ,\n",
+              "         0.        ,  0.        ]])"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 18
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "X_test_proc"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "eMvfZF97-UjY",
+        "outputId": "22c648da-1995-495f-97c8-173e46f91206"
+      },
+      "execution_count": 19,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "array([[-0.77664625, -0.99881554, -1.29380678, ...,  1.        ,\n",
+              "         0.        ,  0.        ],\n",
+              "       [ 0.1003166 , -1.58519423, -0.10214509, ...,  1.        ,\n",
+              "         0.        ,  0.        ],\n",
+              "       [-0.48299432, -1.59578435,  0.13618724, ...,  1.        ,\n",
+              "         0.        ,  0.        ],\n",
+              "       ...,\n",
+              "       [ 1.21832428,  1.09397975,  0.49368575, ...,  1.        ,\n",
+              "         0.        ,  0.        ],\n",
+              "       [-0.77809567, -0.36679966,  0.13618724, ...,  1.        ,\n",
+              "         0.        ,  0.        ],\n",
+              "       [-0.77976293,  0.11221189,  1.0895166 , ...,  1.        ,\n",
+              "         0.        ,  0.        ]])"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 19
+        }
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "##Linear Regression Model"
+      ],
+      "metadata": {
+        "id": "naiBmhT8Wc99"
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "from sklearn.metrics import r2_score, mean_squared_error\n",
+        "from sklearn.linear_model import LinearRegression\n",
+        "linreg = LinearRegression()"
+      ],
+      "metadata": {
+        "id": "Ep0BXrmml-gB"
+      },
+      "execution_count": 20,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "def model_metrics(pipe, X_train, y_train, X_test, y_test, \n",
+        "                       model_name='Regression Model', ):\n",
+        "  train_pred = pipe.predict(X_train)\n",
+        "  test_preds = pipe.predict(X_test)\n",
+        "  \n",
+        "  metrics = ['train_RMSE', 'test_RMSE', \n",
+        "             'train_R2', 'test_R2']\n",
+        "  \n",
+        "  train_rmse = round(np.sqrt(mean_squared_error(y_train, train_pred)), 4)\n",
+        "  test_rmse = round(np.sqrt(mean_squared_error(y_test, test_preds)), 4)\n",
+        "\n",
+        "  test_r2 = round(r2_score(y_test, test_preds), 8)\n",
+        "  train_r2 = round(r2_score(y_train, train_pred), 8)\n",
+        "\n",
+        "  scores = pd.DataFrame(index=metrics, columns=[f'{model_name}'])\n",
+        "  scores.loc[metrics, f'{model_name}'] = [train_rmse, test_rmse,\n",
+        "                                               train_r2, test_r2]\n",
+        "\n",
+        "  return scores"
+      ],
+      "metadata": {
+        "id": "lexUKHXR_FQc"
+      },
+      "execution_count": 21,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "linreg_pipe = make_pipeline(preproc, linreg)\n",
+        "linreg_pipe.fit(X_train, y_train)"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 227
+        },
+        "id": "GxGP_saNmCjJ",
+        "outputId": "585e0b96-13d8-48bb-f534-4713bd13b442"
+      },
+      "execution_count": 22,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "Pipeline(steps=[('columntransformer',\n",
+              "                 ColumnTransformer(transformers=[('pipeline-1',\n",
+              "                                                  Pipeline(steps=[('simpleimputer',\n",
+              "                                                                   SimpleImputer()),\n",
+              "                                                                  ('standardscaler',\n",
+              "                                                                   StandardScaler())]),\n",
+              "                                                  <sklearn.compose._column_transformer.make_column_selector object at 0x7f099c5abb80>),\n",
+              "                                                 ('pipeline-2',\n",
+              "                                                  Pipeline(steps=[('simpleimputer',\n",
+              "                                                                   SimpleImputer(strategy='most_frequent')),\n",
+              "                                                                  ('onehotencoder',\n",
+              "                                                                   OneHotEncoder(handle_unknown='ignore',\n",
+              "                                                                                 sparse_output=False))]),\n",
+              "                                                  <sklearn.compose._column_transformer.make_column_selector object at 0x7f099c5abdc0>)])),\n",
+              "                ('linearregression', LinearRegression())])"
+            ],
+            "text/html": [
+              "<style>#sk-container-id-5 {color: black;background-color: white;}#sk-container-id-5 pre{padding: 0;}#sk-container-id-5 div.sk-toggleable {background-color: white;}#sk-container-id-5 label.sk-toggleable__label {cursor: pointer;display: block;width: 100%;margin-bottom: 0;padding: 0.3em;box-sizing: border-box;text-align: center;}#sk-container-id-5 label.sk-toggleable__label-arrow:before {content: \"▸\";float: left;margin-right: 0.25em;color: #696969;}#sk-container-id-5 label.sk-toggleable__label-arrow:hover:before {color: black;}#sk-container-id-5 div.sk-estimator:hover label.sk-toggleable__label-arrow:before {color: black;}#sk-container-id-5 div.sk-toggleable__content {max-height: 0;max-width: 0;overflow: hidden;text-align: left;background-color: #f0f8ff;}#sk-container-id-5 div.sk-toggleable__content pre {margin: 0.2em;color: black;border-radius: 0.25em;background-color: #f0f8ff;}#sk-container-id-5 input.sk-toggleable__control:checked~div.sk-toggleable__content {max-height: 200px;max-width: 100%;overflow: auto;}#sk-container-id-5 input.sk-toggleable__control:checked~label.sk-toggleable__label-arrow:before {content: \"▾\";}#sk-container-id-5 div.sk-estimator input.sk-toggleable__control:checked~label.sk-toggleable__label {background-color: #d4ebff;}#sk-container-id-5 div.sk-label input.sk-toggleable__control:checked~label.sk-toggleable__label {background-color: #d4ebff;}#sk-container-id-5 input.sk-hidden--visually {border: 0;clip: rect(1px 1px 1px 1px);clip: rect(1px, 1px, 1px, 1px);height: 1px;margin: -1px;overflow: hidden;padding: 0;position: absolute;width: 1px;}#sk-container-id-5 div.sk-estimator {font-family: monospace;background-color: #f0f8ff;border: 1px dotted black;border-radius: 0.25em;box-sizing: border-box;margin-bottom: 0.5em;}#sk-container-id-5 div.sk-estimator:hover {background-color: #d4ebff;}#sk-container-id-5 div.sk-parallel-item::after {content: \"\";width: 100%;border-bottom: 1px solid gray;flex-grow: 1;}#sk-container-id-5 div.sk-label:hover label.sk-toggleable__label {background-color: #d4ebff;}#sk-container-id-5 div.sk-serial::before {content: \"\";position: absolute;border-left: 1px solid gray;box-sizing: border-box;top: 0;bottom: 0;left: 50%;z-index: 0;}#sk-container-id-5 div.sk-serial {display: flex;flex-direction: column;align-items: center;background-color: white;padding-right: 0.2em;padding-left: 0.2em;position: relative;}#sk-container-id-5 div.sk-item {position: relative;z-index: 1;}#sk-container-id-5 div.sk-parallel {display: flex;align-items: stretch;justify-content: center;background-color: white;position: relative;}#sk-container-id-5 div.sk-item::before, #sk-container-id-5 div.sk-parallel-item::before {content: \"\";position: absolute;border-left: 1px solid gray;box-sizing: border-box;top: 0;bottom: 0;left: 50%;z-index: -1;}#sk-container-id-5 div.sk-parallel-item {display: flex;flex-direction: column;z-index: 1;position: relative;background-color: white;}#sk-container-id-5 div.sk-parallel-item:first-child::after {align-self: flex-end;width: 50%;}#sk-container-id-5 div.sk-parallel-item:last-child::after {align-self: flex-start;width: 50%;}#sk-container-id-5 div.sk-parallel-item:only-child::after {width: 0;}#sk-container-id-5 div.sk-dashed-wrapped {border: 1px dashed gray;margin: 0 0.4em 0.5em 0.4em;box-sizing: border-box;padding-bottom: 0.4em;background-color: white;}#sk-container-id-5 div.sk-label label {font-family: monospace;font-weight: bold;display: inline-block;line-height: 1.2em;}#sk-container-id-5 div.sk-label-container {text-align: center;}#sk-container-id-5 div.sk-container {/* jupyter's `normalize.less` sets `[hidden] { display: none; }` but bootstrap.min.css set `[hidden] { display: none !important; }` so we also need the `!important` here to be able to override the default hidden behavior on the sphinx rendered scikit-learn.org. See: https://github.com/scikit-learn/scikit-learn/issues/21755 */display: inline-block !important;position: relative;}#sk-container-id-5 div.sk-text-repr-fallback {display: none;}</style><div id=\"sk-container-id-5\" class=\"sk-top-container\"><div class=\"sk-text-repr-fallback\"><pre>Pipeline(steps=[(&#x27;columntransformer&#x27;,\n",
+              "                 ColumnTransformer(transformers=[(&#x27;pipeline-1&#x27;,\n",
+              "                                                  Pipeline(steps=[(&#x27;simpleimputer&#x27;,\n",
+              "                                                                   SimpleImputer()),\n",
+              "                                                                  (&#x27;standardscaler&#x27;,\n",
+              "                                                                   StandardScaler())]),\n",
+              "                                                  &lt;sklearn.compose._column_transformer.make_column_selector object at 0x7f099c5abb80&gt;),\n",
+              "                                                 (&#x27;pipeline-2&#x27;,\n",
+              "                                                  Pipeline(steps=[(&#x27;simpleimputer&#x27;,\n",
+              "                                                                   SimpleImputer(strategy=&#x27;most_frequent&#x27;)),\n",
+              "                                                                  (&#x27;onehotencoder&#x27;,\n",
+              "                                                                   OneHotEncoder(handle_unknown=&#x27;ignore&#x27;,\n",
+              "                                                                                 sparse_output=False))]),\n",
+              "                                                  &lt;sklearn.compose._column_transformer.make_column_selector object at 0x7f099c5abdc0&gt;)])),\n",
+              "                (&#x27;linearregression&#x27;, LinearRegression())])</pre><b>In a Jupyter environment, please rerun this cell to show the HTML representation or trust the notebook. <br />On GitHub, the HTML representation is unable to render, please try loading this page with nbviewer.org.</b></div><div class=\"sk-container\" hidden><div class=\"sk-item sk-dashed-wrapped\"><div class=\"sk-label-container\"><div class=\"sk-label sk-toggleable\"><input class=\"sk-toggleable__control sk-hidden--visually\" id=\"sk-estimator-id-21\" type=\"checkbox\" ><label for=\"sk-estimator-id-21\" class=\"sk-toggleable__label sk-toggleable__label-arrow\">Pipeline</label><div class=\"sk-toggleable__content\"><pre>Pipeline(steps=[(&#x27;columntransformer&#x27;,\n",
+              "                 ColumnTransformer(transformers=[(&#x27;pipeline-1&#x27;,\n",
+              "                                                  Pipeline(steps=[(&#x27;simpleimputer&#x27;,\n",
+              "                                                                   SimpleImputer()),\n",
+              "                                                                  (&#x27;standardscaler&#x27;,\n",
+              "                                                                   StandardScaler())]),\n",
+              "                                                  &lt;sklearn.compose._column_transformer.make_column_selector object at 0x7f099c5abb80&gt;),\n",
+              "                                                 (&#x27;pipeline-2&#x27;,\n",
+              "                                                  Pipeline(steps=[(&#x27;simpleimputer&#x27;,\n",
+              "                                                                   SimpleImputer(strategy=&#x27;most_frequent&#x27;)),\n",
+              "                                                                  (&#x27;onehotencoder&#x27;,\n",
+              "                                                                   OneHotEncoder(handle_unknown=&#x27;ignore&#x27;,\n",
+              "                                                                                 sparse_output=False))]),\n",
+              "                                                  &lt;sklearn.compose._column_transformer.make_column_selector object at 0x7f099c5abdc0&gt;)])),\n",
+              "                (&#x27;linearregression&#x27;, LinearRegression())])</pre></div></div></div><div class=\"sk-serial\"><div class=\"sk-item sk-dashed-wrapped\"><div class=\"sk-label-container\"><div class=\"sk-label sk-toggleable\"><input class=\"sk-toggleable__control sk-hidden--visually\" id=\"sk-estimator-id-22\" type=\"checkbox\" ><label for=\"sk-estimator-id-22\" class=\"sk-toggleable__label sk-toggleable__label-arrow\">columntransformer: ColumnTransformer</label><div class=\"sk-toggleable__content\"><pre>ColumnTransformer(transformers=[(&#x27;pipeline-1&#x27;,\n",
+              "                                 Pipeline(steps=[(&#x27;simpleimputer&#x27;,\n",
+              "                                                  SimpleImputer()),\n",
+              "                                                 (&#x27;standardscaler&#x27;,\n",
+              "                                                  StandardScaler())]),\n",
+              "                                 &lt;sklearn.compose._column_transformer.make_column_selector object at 0x7f099c5abb80&gt;),\n",
+              "                                (&#x27;pipeline-2&#x27;,\n",
+              "                                 Pipeline(steps=[(&#x27;simpleimputer&#x27;,\n",
+              "                                                  SimpleImputer(strategy=&#x27;most_frequent&#x27;)),\n",
+              "                                                 (&#x27;onehotencoder&#x27;,\n",
+              "                                                  OneHotEncoder(handle_unknown=&#x27;ignore&#x27;,\n",
+              "                                                                sparse_output=False))]),\n",
+              "                                 &lt;sklearn.compose._column_transformer.make_column_selector object at 0x7f099c5abdc0&gt;)])</pre></div></div></div><div class=\"sk-parallel\"><div class=\"sk-parallel-item\"><div class=\"sk-item\"><div class=\"sk-label-container\"><div class=\"sk-label sk-toggleable\"><input class=\"sk-toggleable__control sk-hidden--visually\" id=\"sk-estimator-id-23\" type=\"checkbox\" ><label for=\"sk-estimator-id-23\" class=\"sk-toggleable__label sk-toggleable__label-arrow\">pipeline-1</label><div class=\"sk-toggleable__content\"><pre>&lt;sklearn.compose._column_transformer.make_column_selector object at 0x7f099c5abb80&gt;</pre></div></div></div><div class=\"sk-serial\"><div class=\"sk-item\"><div class=\"sk-serial\"><div class=\"sk-item\"><div class=\"sk-estimator sk-toggleable\"><input class=\"sk-toggleable__control sk-hidden--visually\" id=\"sk-estimator-id-24\" type=\"checkbox\" ><label for=\"sk-estimator-id-24\" class=\"sk-toggleable__label sk-toggleable__label-arrow\">SimpleImputer</label><div class=\"sk-toggleable__content\"><pre>SimpleImputer()</pre></div></div></div><div class=\"sk-item\"><div class=\"sk-estimator sk-toggleable\"><input class=\"sk-toggleable__control sk-hidden--visually\" id=\"sk-estimator-id-25\" type=\"checkbox\" ><label for=\"sk-estimator-id-25\" class=\"sk-toggleable__label sk-toggleable__label-arrow\">StandardScaler</label><div class=\"sk-toggleable__content\"><pre>StandardScaler()</pre></div></div></div></div></div></div></div></div><div class=\"sk-parallel-item\"><div class=\"sk-item\"><div class=\"sk-label-container\"><div class=\"sk-label sk-toggleable\"><input class=\"sk-toggleable__control sk-hidden--visually\" id=\"sk-estimator-id-26\" type=\"checkbox\" ><label for=\"sk-estimator-id-26\" class=\"sk-toggleable__label sk-toggleable__label-arrow\">pipeline-2</label><div class=\"sk-toggleable__content\"><pre>&lt;sklearn.compose._column_transformer.make_column_selector object at 0x7f099c5abdc0&gt;</pre></div></div></div><div class=\"sk-serial\"><div class=\"sk-item\"><div class=\"sk-serial\"><div class=\"sk-item\"><div class=\"sk-estimator sk-toggleable\"><input class=\"sk-toggleable__control sk-hidden--visually\" id=\"sk-estimator-id-27\" type=\"checkbox\" ><label for=\"sk-estimator-id-27\" class=\"sk-toggleable__label sk-toggleable__label-arrow\">SimpleImputer</label><div class=\"sk-toggleable__content\"><pre>SimpleImputer(strategy=&#x27;most_frequent&#x27;)</pre></div></div></div><div class=\"sk-item\"><div class=\"sk-estimator sk-toggleable\"><input class=\"sk-toggleable__control sk-hidden--visually\" id=\"sk-estimator-id-28\" type=\"checkbox\" ><label for=\"sk-estimator-id-28\" class=\"sk-toggleable__label sk-toggleable__label-arrow\">OneHotEncoder</label><div class=\"sk-toggleable__content\"><pre>OneHotEncoder(handle_unknown=&#x27;ignore&#x27;, sparse_output=False)</pre></div></div></div></div></div></div></div></div></div></div><div class=\"sk-item\"><div class=\"sk-estimator sk-toggleable\"><input class=\"sk-toggleable__control sk-hidden--visually\" id=\"sk-estimator-id-29\" type=\"checkbox\" ><label for=\"sk-estimator-id-29\" class=\"sk-toggleable__label sk-toggleable__label-arrow\">LinearRegression</label><div class=\"sk-toggleable__content\"><pre>LinearRegression()</pre></div></div></div></div></div></div></div>"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 22
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# Display model metrics\n",
+        "scores_df = model_metrics(linreg_pipe, X_train=X_train, y_train=y_train, \n",
+        "                          X_test=X_test, y_test=y_test, \n",
+        "                           model_name='Linear Regression')\n",
+        "\n",
+        "display(scores_df)"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 175
+        },
+        "id": "ZoQf6lIWivJZ",
+        "outputId": "3a4185c7-467e-4b1f-8b82-48172ef36e0d"
+      },
+      "execution_count": 23,
+      "outputs": [
+        {
+          "output_type": "display_data",
+          "data": {
+            "text/plain": [
+              "           Linear Regression\n",
+              "train_RMSE         1139.1332\n",
+              "test_RMSE          1092.7262\n",
+              "train_R2            0.561533\n",
+              "test_R2             0.567213"
+            ],
+            "text/html": [
+              "\n",
+              "  <div id=\"df-4f9f1131-ba46-4f88-ab5d-5d5066159982\">\n",
+              "    <div class=\"colab-df-container\">\n",
+              "      <div>\n",
+              "<style scoped>\n",
+              "    .dataframe tbody tr th:only-of-type {\n",
+              "        vertical-align: middle;\n",
+              "    }\n",
+              "\n",
+              "    .dataframe tbody tr th {\n",
+              "        vertical-align: top;\n",
+              "    }\n",
+              "\n",
+              "    .dataframe thead th {\n",
+              "        text-align: right;\n",
+              "    }\n",
+              "</style>\n",
+              "<table border=\"1\" class=\"dataframe\">\n",
+              "  <thead>\n",
+              "    <tr style=\"text-align: right;\">\n",
+              "      <th></th>\n",
+              "      <th>Linear Regression</th>\n",
+              "    </tr>\n",
+              "  </thead>\n",
+              "  <tbody>\n",
+              "    <tr>\n",
+              "      <th>train_RMSE</th>\n",
+              "      <td>1139.1332</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>test_RMSE</th>\n",
+              "      <td>1092.7262</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>train_R2</th>\n",
+              "      <td>0.561533</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>test_R2</th>\n",
+              "      <td>0.567213</td>\n",
+              "    </tr>\n",
+              "  </tbody>\n",
+              "</table>\n",
+              "</div>\n",
+              "      <button class=\"colab-df-convert\" onclick=\"convertToInteractive('df-4f9f1131-ba46-4f88-ab5d-5d5066159982')\"\n",
+              "              title=\"Convert this dataframe to an interactive table.\"\n",
+              "              style=\"display:none;\">\n",
+              "        \n",
+              "  <svg xmlns=\"http://www.w3.org/2000/svg\" height=\"24px\"viewBox=\"0 0 24 24\"\n",
+              "       width=\"24px\">\n",
+              "    <path d=\"M0 0h24v24H0V0z\" fill=\"none\"/>\n",
+              "    <path d=\"M18.56 5.44l.94 2.06.94-2.06 2.06-.94-2.06-.94-.94-2.06-.94 2.06-2.06.94zm-11 1L8.5 8.5l.94-2.06 2.06-.94-2.06-.94L8.5 2.5l-.94 2.06-2.06.94zm10 10l.94 2.06.94-2.06 2.06-.94-2.06-.94-.94-2.06-.94 2.06-2.06.94z\"/><path d=\"M17.41 7.96l-1.37-1.37c-.4-.4-.92-.59-1.43-.59-.52 0-1.04.2-1.43.59L10.3 9.45l-7.72 7.72c-.78.78-.78 2.05 0 2.83L4 21.41c.39.39.9.59 1.41.59.51 0 1.02-.2 1.41-.59l7.78-7.78 2.81-2.81c.8-.78.8-2.07 0-2.86zM5.41 20L4 18.59l7.72-7.72 1.47 1.35L5.41 20z\"/>\n",
+              "  </svg>\n",
+              "      </button>\n",
+              "      \n",
+              "  <style>\n",
+              "    .colab-df-container {\n",
+              "      display:flex;\n",
+              "      flex-wrap:wrap;\n",
+              "      gap: 12px;\n",
+              "    }\n",
+              "\n",
+              "    .colab-df-convert {\n",
+              "      background-color: #E8F0FE;\n",
+              "      border: none;\n",
+              "      border-radius: 50%;\n",
+              "      cursor: pointer;\n",
+              "      display: none;\n",
+              "      fill: #1967D2;\n",
+              "      height: 32px;\n",
+              "      padding: 0 0 0 0;\n",
+              "      width: 32px;\n",
+              "    }\n",
+              "\n",
+              "    .colab-df-convert:hover {\n",
+              "      background-color: #E2EBFA;\n",
+              "      box-shadow: 0px 1px 2px rgba(60, 64, 67, 0.3), 0px 1px 3px 1px rgba(60, 64, 67, 0.15);\n",
+              "      fill: #174EA6;\n",
+              "    }\n",
+              "\n",
+              "    [theme=dark] .colab-df-convert {\n",
+              "      background-color: #3B4455;\n",
+              "      fill: #D2E3FC;\n",
+              "    }\n",
+              "\n",
+              "    [theme=dark] .colab-df-convert:hover {\n",
+              "      background-color: #434B5C;\n",
+              "      box-shadow: 0px 1px 3px 1px rgba(0, 0, 0, 0.15);\n",
+              "      filter: drop-shadow(0px 1px 2px rgba(0, 0, 0, 0.3));\n",
+              "      fill: #FFFFFF;\n",
+              "    }\n",
+              "  </style>\n",
+              "\n",
+              "      <script>\n",
+              "        const buttonEl =\n",
+              "          document.querySelector('#df-4f9f1131-ba46-4f88-ab5d-5d5066159982 button.colab-df-convert');\n",
+              "        buttonEl.style.display =\n",
+              "          google.colab.kernel.accessAllowed ? 'block' : 'none';\n",
+              "\n",
+              "        async function convertToInteractive(key) {\n",
+              "          const element = document.querySelector('#df-4f9f1131-ba46-4f88-ab5d-5d5066159982');\n",
+              "          const dataTable =\n",
+              "            await google.colab.kernel.invokeFunction('convertToInteractive',\n",
+              "                                                     [key], {});\n",
+              "          if (!dataTable) return;\n",
+              "\n",
+              "          const docLinkHtml = 'Like what you see? Visit the ' +\n",
+              "            '<a target=\"_blank\" href=https://colab.research.google.com/notebooks/data_table.ipynb>data table notebook</a>'\n",
+              "            + ' to learn more about interactive tables.';\n",
+              "          element.innerHTML = '';\n",
+              "          dataTable['output_type'] = 'display_data';\n",
+              "          await google.colab.output.renderOutput(dataTable, element);\n",
+              "          const docLink = document.createElement('div');\n",
+              "          docLink.innerHTML = docLinkHtml;\n",
+              "          element.appendChild(docLink);\n",
+              "        }\n",
+              "      </script>\n",
+              "    </div>\n",
+              "  </div>\n",
+              "  "
+            ]
+          },
+          "metadata": {}
+        }
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "##Regression Tree Model"
+      ],
+      "metadata": {
+        "id": "Q92TOfdQhi2x"
+      }
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "- Creating a function and data frame to return model metrics."
+      ],
+      "metadata": {
+        "id": "Rpfhxu_jdhSE"
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "from sklearn.ensemble import RandomForestRegressor\n",
+        "\n",
+        "# Instantiate model\n",
+        "rf = RandomForestRegressor(random_state = 42)\n",
+        "# Create pipeline\n",
+        "rf_pipe = make_pipeline(preproc, rf)\n",
+        "# Fit model\n",
+        "rf_pipe.fit(X_train, y_train)"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 227
+        },
+        "id": "kDkDtp3Rf0EY",
+        "outputId": "ab6f747a-5d2e-426f-9f0c-e5ff7566e46f"
+      },
+      "execution_count": 24,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "Pipeline(steps=[('columntransformer',\n",
+              "                 ColumnTransformer(transformers=[('pipeline-1',\n",
+              "                                                  Pipeline(steps=[('simpleimputer',\n",
+              "                                                                   SimpleImputer()),\n",
+              "                                                                  ('standardscaler',\n",
+              "                                                                   StandardScaler())]),\n",
+              "                                                  <sklearn.compose._column_transformer.make_column_selector object at 0x7f099c5abb80>),\n",
+              "                                                 ('pipeline-2',\n",
+              "                                                  Pipeline(steps=[('simpleimputer',\n",
+              "                                                                   SimpleImputer(strategy='most_frequent')),\n",
+              "                                                                  ('onehotencoder',\n",
+              "                                                                   OneHotEncoder(handle_unknown='ignore',\n",
+              "                                                                                 sparse_output=False))]),\n",
+              "                                                  <sklearn.compose._column_transformer.make_column_selector object at 0x7f099c5abdc0>)])),\n",
+              "                ('randomforestregressor',\n",
+              "                 RandomForestRegressor(random_state=42))])"
+            ],
+            "text/html": [
+              "<style>#sk-container-id-6 {color: black;background-color: white;}#sk-container-id-6 pre{padding: 0;}#sk-container-id-6 div.sk-toggleable {background-color: white;}#sk-container-id-6 label.sk-toggleable__label {cursor: pointer;display: block;width: 100%;margin-bottom: 0;padding: 0.3em;box-sizing: border-box;text-align: center;}#sk-container-id-6 label.sk-toggleable__label-arrow:before {content: \"▸\";float: left;margin-right: 0.25em;color: #696969;}#sk-container-id-6 label.sk-toggleable__label-arrow:hover:before {color: black;}#sk-container-id-6 div.sk-estimator:hover label.sk-toggleable__label-arrow:before {color: black;}#sk-container-id-6 div.sk-toggleable__content {max-height: 0;max-width: 0;overflow: hidden;text-align: left;background-color: #f0f8ff;}#sk-container-id-6 div.sk-toggleable__content pre {margin: 0.2em;color: black;border-radius: 0.25em;background-color: #f0f8ff;}#sk-container-id-6 input.sk-toggleable__control:checked~div.sk-toggleable__content {max-height: 200px;max-width: 100%;overflow: auto;}#sk-container-id-6 input.sk-toggleable__control:checked~label.sk-toggleable__label-arrow:before {content: \"▾\";}#sk-container-id-6 div.sk-estimator input.sk-toggleable__control:checked~label.sk-toggleable__label {background-color: #d4ebff;}#sk-container-id-6 div.sk-label input.sk-toggleable__control:checked~label.sk-toggleable__label {background-color: #d4ebff;}#sk-container-id-6 input.sk-hidden--visually {border: 0;clip: rect(1px 1px 1px 1px);clip: rect(1px, 1px, 1px, 1px);height: 1px;margin: -1px;overflow: hidden;padding: 0;position: absolute;width: 1px;}#sk-container-id-6 div.sk-estimator {font-family: monospace;background-color: #f0f8ff;border: 1px dotted black;border-radius: 0.25em;box-sizing: border-box;margin-bottom: 0.5em;}#sk-container-id-6 div.sk-estimator:hover {background-color: #d4ebff;}#sk-container-id-6 div.sk-parallel-item::after {content: \"\";width: 100%;border-bottom: 1px solid gray;flex-grow: 1;}#sk-container-id-6 div.sk-label:hover label.sk-toggleable__label {background-color: #d4ebff;}#sk-container-id-6 div.sk-serial::before {content: \"\";position: absolute;border-left: 1px solid gray;box-sizing: border-box;top: 0;bottom: 0;left: 50%;z-index: 0;}#sk-container-id-6 div.sk-serial {display: flex;flex-direction: column;align-items: center;background-color: white;padding-right: 0.2em;padding-left: 0.2em;position: relative;}#sk-container-id-6 div.sk-item {position: relative;z-index: 1;}#sk-container-id-6 div.sk-parallel {display: flex;align-items: stretch;justify-content: center;background-color: white;position: relative;}#sk-container-id-6 div.sk-item::before, #sk-container-id-6 div.sk-parallel-item::before {content: \"\";position: absolute;border-left: 1px solid gray;box-sizing: border-box;top: 0;bottom: 0;left: 50%;z-index: -1;}#sk-container-id-6 div.sk-parallel-item {display: flex;flex-direction: column;z-index: 1;position: relative;background-color: white;}#sk-container-id-6 div.sk-parallel-item:first-child::after {align-self: flex-end;width: 50%;}#sk-container-id-6 div.sk-parallel-item:last-child::after {align-self: flex-start;width: 50%;}#sk-container-id-6 div.sk-parallel-item:only-child::after {width: 0;}#sk-container-id-6 div.sk-dashed-wrapped {border: 1px dashed gray;margin: 0 0.4em 0.5em 0.4em;box-sizing: border-box;padding-bottom: 0.4em;background-color: white;}#sk-container-id-6 div.sk-label label {font-family: monospace;font-weight: bold;display: inline-block;line-height: 1.2em;}#sk-container-id-6 div.sk-label-container {text-align: center;}#sk-container-id-6 div.sk-container {/* jupyter's `normalize.less` sets `[hidden] { display: none; }` but bootstrap.min.css set `[hidden] { display: none !important; }` so we also need the `!important` here to be able to override the default hidden behavior on the sphinx rendered scikit-learn.org. See: https://github.com/scikit-learn/scikit-learn/issues/21755 */display: inline-block !important;position: relative;}#sk-container-id-6 div.sk-text-repr-fallback {display: none;}</style><div id=\"sk-container-id-6\" class=\"sk-top-container\"><div class=\"sk-text-repr-fallback\"><pre>Pipeline(steps=[(&#x27;columntransformer&#x27;,\n",
+              "                 ColumnTransformer(transformers=[(&#x27;pipeline-1&#x27;,\n",
+              "                                                  Pipeline(steps=[(&#x27;simpleimputer&#x27;,\n",
+              "                                                                   SimpleImputer()),\n",
+              "                                                                  (&#x27;standardscaler&#x27;,\n",
+              "                                                                   StandardScaler())]),\n",
+              "                                                  &lt;sklearn.compose._column_transformer.make_column_selector object at 0x7f099c5abb80&gt;),\n",
+              "                                                 (&#x27;pipeline-2&#x27;,\n",
+              "                                                  Pipeline(steps=[(&#x27;simpleimputer&#x27;,\n",
+              "                                                                   SimpleImputer(strategy=&#x27;most_frequent&#x27;)),\n",
+              "                                                                  (&#x27;onehotencoder&#x27;,\n",
+              "                                                                   OneHotEncoder(handle_unknown=&#x27;ignore&#x27;,\n",
+              "                                                                                 sparse_output=False))]),\n",
+              "                                                  &lt;sklearn.compose._column_transformer.make_column_selector object at 0x7f099c5abdc0&gt;)])),\n",
+              "                (&#x27;randomforestregressor&#x27;,\n",
+              "                 RandomForestRegressor(random_state=42))])</pre><b>In a Jupyter environment, please rerun this cell to show the HTML representation or trust the notebook. <br />On GitHub, the HTML representation is unable to render, please try loading this page with nbviewer.org.</b></div><div class=\"sk-container\" hidden><div class=\"sk-item sk-dashed-wrapped\"><div class=\"sk-label-container\"><div class=\"sk-label sk-toggleable\"><input class=\"sk-toggleable__control sk-hidden--visually\" id=\"sk-estimator-id-30\" type=\"checkbox\" ><label for=\"sk-estimator-id-30\" class=\"sk-toggleable__label sk-toggleable__label-arrow\">Pipeline</label><div class=\"sk-toggleable__content\"><pre>Pipeline(steps=[(&#x27;columntransformer&#x27;,\n",
+              "                 ColumnTransformer(transformers=[(&#x27;pipeline-1&#x27;,\n",
+              "                                                  Pipeline(steps=[(&#x27;simpleimputer&#x27;,\n",
+              "                                                                   SimpleImputer()),\n",
+              "                                                                  (&#x27;standardscaler&#x27;,\n",
+              "                                                                   StandardScaler())]),\n",
+              "                                                  &lt;sklearn.compose._column_transformer.make_column_selector object at 0x7f099c5abb80&gt;),\n",
+              "                                                 (&#x27;pipeline-2&#x27;,\n",
+              "                                                  Pipeline(steps=[(&#x27;simpleimputer&#x27;,\n",
+              "                                                                   SimpleImputer(strategy=&#x27;most_frequent&#x27;)),\n",
+              "                                                                  (&#x27;onehotencoder&#x27;,\n",
+              "                                                                   OneHotEncoder(handle_unknown=&#x27;ignore&#x27;,\n",
+              "                                                                                 sparse_output=False))]),\n",
+              "                                                  &lt;sklearn.compose._column_transformer.make_column_selector object at 0x7f099c5abdc0&gt;)])),\n",
+              "                (&#x27;randomforestregressor&#x27;,\n",
+              "                 RandomForestRegressor(random_state=42))])</pre></div></div></div><div class=\"sk-serial\"><div class=\"sk-item sk-dashed-wrapped\"><div class=\"sk-label-container\"><div class=\"sk-label sk-toggleable\"><input class=\"sk-toggleable__control sk-hidden--visually\" id=\"sk-estimator-id-31\" type=\"checkbox\" ><label for=\"sk-estimator-id-31\" class=\"sk-toggleable__label sk-toggleable__label-arrow\">columntransformer: ColumnTransformer</label><div class=\"sk-toggleable__content\"><pre>ColumnTransformer(transformers=[(&#x27;pipeline-1&#x27;,\n",
+              "                                 Pipeline(steps=[(&#x27;simpleimputer&#x27;,\n",
+              "                                                  SimpleImputer()),\n",
+              "                                                 (&#x27;standardscaler&#x27;,\n",
+              "                                                  StandardScaler())]),\n",
+              "                                 &lt;sklearn.compose._column_transformer.make_column_selector object at 0x7f099c5abb80&gt;),\n",
+              "                                (&#x27;pipeline-2&#x27;,\n",
+              "                                 Pipeline(steps=[(&#x27;simpleimputer&#x27;,\n",
+              "                                                  SimpleImputer(strategy=&#x27;most_frequent&#x27;)),\n",
+              "                                                 (&#x27;onehotencoder&#x27;,\n",
+              "                                                  OneHotEncoder(handle_unknown=&#x27;ignore&#x27;,\n",
+              "                                                                sparse_output=False))]),\n",
+              "                                 &lt;sklearn.compose._column_transformer.make_column_selector object at 0x7f099c5abdc0&gt;)])</pre></div></div></div><div class=\"sk-parallel\"><div class=\"sk-parallel-item\"><div class=\"sk-item\"><div class=\"sk-label-container\"><div class=\"sk-label sk-toggleable\"><input class=\"sk-toggleable__control sk-hidden--visually\" id=\"sk-estimator-id-32\" type=\"checkbox\" ><label for=\"sk-estimator-id-32\" class=\"sk-toggleable__label sk-toggleable__label-arrow\">pipeline-1</label><div class=\"sk-toggleable__content\"><pre>&lt;sklearn.compose._column_transformer.make_column_selector object at 0x7f099c5abb80&gt;</pre></div></div></div><div class=\"sk-serial\"><div class=\"sk-item\"><div class=\"sk-serial\"><div class=\"sk-item\"><div class=\"sk-estimator sk-toggleable\"><input class=\"sk-toggleable__control sk-hidden--visually\" id=\"sk-estimator-id-33\" type=\"checkbox\" ><label for=\"sk-estimator-id-33\" class=\"sk-toggleable__label sk-toggleable__label-arrow\">SimpleImputer</label><div class=\"sk-toggleable__content\"><pre>SimpleImputer()</pre></div></div></div><div class=\"sk-item\"><div class=\"sk-estimator sk-toggleable\"><input class=\"sk-toggleable__control sk-hidden--visually\" id=\"sk-estimator-id-34\" type=\"checkbox\" ><label for=\"sk-estimator-id-34\" class=\"sk-toggleable__label sk-toggleable__label-arrow\">StandardScaler</label><div class=\"sk-toggleable__content\"><pre>StandardScaler()</pre></div></div></div></div></div></div></div></div><div class=\"sk-parallel-item\"><div class=\"sk-item\"><div class=\"sk-label-container\"><div class=\"sk-label sk-toggleable\"><input class=\"sk-toggleable__control sk-hidden--visually\" id=\"sk-estimator-id-35\" type=\"checkbox\" ><label for=\"sk-estimator-id-35\" class=\"sk-toggleable__label sk-toggleable__label-arrow\">pipeline-2</label><div class=\"sk-toggleable__content\"><pre>&lt;sklearn.compose._column_transformer.make_column_selector object at 0x7f099c5abdc0&gt;</pre></div></div></div><div class=\"sk-serial\"><div class=\"sk-item\"><div class=\"sk-serial\"><div class=\"sk-item\"><div class=\"sk-estimator sk-toggleable\"><input class=\"sk-toggleable__control sk-hidden--visually\" id=\"sk-estimator-id-36\" type=\"checkbox\" ><label for=\"sk-estimator-id-36\" class=\"sk-toggleable__label sk-toggleable__label-arrow\">SimpleImputer</label><div class=\"sk-toggleable__content\"><pre>SimpleImputer(strategy=&#x27;most_frequent&#x27;)</pre></div></div></div><div class=\"sk-item\"><div class=\"sk-estimator sk-toggleable\"><input class=\"sk-toggleable__control sk-hidden--visually\" id=\"sk-estimator-id-37\" type=\"checkbox\" ><label for=\"sk-estimator-id-37\" class=\"sk-toggleable__label sk-toggleable__label-arrow\">OneHotEncoder</label><div class=\"sk-toggleable__content\"><pre>OneHotEncoder(handle_unknown=&#x27;ignore&#x27;, sparse_output=False)</pre></div></div></div></div></div></div></div></div></div></div><div class=\"sk-item\"><div class=\"sk-estimator sk-toggleable\"><input class=\"sk-toggleable__control sk-hidden--visually\" id=\"sk-estimator-id-38\" type=\"checkbox\" ><label for=\"sk-estimator-id-38\" class=\"sk-toggleable__label sk-toggleable__label-arrow\">RandomForestRegressor</label><div class=\"sk-toggleable__content\"><pre>RandomForestRegressor(random_state=42)</pre></div></div></div></div></div></div></div>"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 24
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# Predict target values on both sets\n",
+        "rftrain_pred = rf_pipe.predict(X_train)\n",
+        "rftest_pred = rf_pipe.predict(X_test)\n",
+        "\n",
+        "# Evaluate the model\n",
+        "rftrain_score = rf_pipe.score(X_train, y_train)\n",
+        "rftest_score = rf_pipe.score(X_test, y_test)\n",
+        "print(f'Train Score: {rftrain_score}\\nTest Score: {rftest_score}')"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "bLsRNmjeW8eW",
+        "outputId": "453a6614-c15c-495d-8504-29eb92004951"
+      },
+      "execution_count": 25,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Train Score: 0.9382570972408262\n",
+            "Test Score: 0.559808945402366\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# Tune the model\n",
+        "\n",
+        "rf.get_params()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "HwfIrJfoW9HB",
+        "outputId": "720cca23-4249-476a-9c90-9aa8af1a77e2"
+      },
+      "execution_count": 26,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "{'bootstrap': True,\n",
+              " 'ccp_alpha': 0.0,\n",
+              " 'criterion': 'squared_error',\n",
+              " 'max_depth': None,\n",
+              " 'max_features': 1.0,\n",
+              " 'max_leaf_nodes': None,\n",
+              " 'max_samples': None,\n",
+              " 'min_impurity_decrease': 0.0,\n",
+              " 'min_samples_leaf': 1,\n",
+              " 'min_samples_split': 2,\n",
+              " 'min_weight_fraction_leaf': 0.0,\n",
+              " 'n_estimators': 100,\n",
+              " 'n_jobs': None,\n",
+              " 'oob_score': False,\n",
+              " 'random_state': 42,\n",
+              " 'verbose': 0,\n",
+              " 'warm_start': False}"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 26
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# Finding max depth\n",
+        "\n",
+        "est_depths = [estimator.get_depth() for estimator in rf.estimators_]\n",
+        "max(est_depths)"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "LGhJE6s9agkF",
+        "outputId": "333f4692-625c-4ae9-a5ae-0c552ff3756a"
+      },
+      "execution_count": 27,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "43"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 27
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# Create range of depth\n",
+        "rfdepths = list(range(1, 43)) \n",
+        "\n",
+        "# Data frame to store the scores\n",
+        "rfscores = pd.DataFrame(index=rfdepths, columns=['Train Score', 'Test Score'])\n",
+        "\n",
+        "# Iterate through the values to find the best number of estimators\n",
+        "for depth in rfdepths:\n",
+        "   rf = RandomForestRegressor(max_depth = depth)\n",
+        "   rf_pipe = make_pipeline(preproc, rf)\n",
+        "   rf_pipe.fit(X_train, y_train)\n",
+        "   train_score = rf_pipe.score(X_train, y_train)\n",
+        "   test_score = rf_pipe.score(X_test, y_test)\n",
+        "   rfscores.loc[depth, 'Train Score'] = train_score\n",
+        "   rfscores.loc[depth, 'Test Score'] = test_score\n",
+        "rfbest = rfscores.sort_values(by = 'Test Score', ascending = False)\n",
+        "rfbest.head()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 206
+        },
+        "id": "BB14Aah9XBSb",
+        "outputId": "c20a92b9-2065-4b73-b24f-7f0fe2581127"
+      },
+      "execution_count": 28,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "  Train Score Test Score\n",
+              "5    0.610639    0.60279\n",
+              "6    0.623986   0.602031\n",
+              "4    0.596324   0.597103\n",
+              "7    0.641091   0.596303\n",
+              "8    0.663301   0.593419"
+            ],
+            "text/html": [
+              "\n",
+              "  <div id=\"df-1947602d-160c-4dc9-a8a0-b7a924d389fa\">\n",
+              "    <div class=\"colab-df-container\">\n",
+              "      <div>\n",
+              "<style scoped>\n",
+              "    .dataframe tbody tr th:only-of-type {\n",
+              "        vertical-align: middle;\n",
+              "    }\n",
+              "\n",
+              "    .dataframe tbody tr th {\n",
+              "        vertical-align: top;\n",
+              "    }\n",
+              "\n",
+              "    .dataframe thead th {\n",
+              "        text-align: right;\n",
+              "    }\n",
+              "</style>\n",
+              "<table border=\"1\" class=\"dataframe\">\n",
+              "  <thead>\n",
+              "    <tr style=\"text-align: right;\">\n",
+              "      <th></th>\n",
+              "      <th>Train Score</th>\n",
+              "      <th>Test Score</th>\n",
+              "    </tr>\n",
+              "  </thead>\n",
+              "  <tbody>\n",
+              "    <tr>\n",
+              "      <th>5</th>\n",
+              "      <td>0.610639</td>\n",
+              "      <td>0.60279</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>6</th>\n",
+              "      <td>0.623986</td>\n",
+              "      <td>0.602031</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>4</th>\n",
+              "      <td>0.596324</td>\n",
+              "      <td>0.597103</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>7</th>\n",
+              "      <td>0.641091</td>\n",
+              "      <td>0.596303</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>8</th>\n",
+              "      <td>0.663301</td>\n",
+              "      <td>0.593419</td>\n",
+              "    </tr>\n",
+              "  </tbody>\n",
+              "</table>\n",
+              "</div>\n",
+              "      <button class=\"colab-df-convert\" onclick=\"convertToInteractive('df-1947602d-160c-4dc9-a8a0-b7a924d389fa')\"\n",
+              "              title=\"Convert this dataframe to an interactive table.\"\n",
+              "              style=\"display:none;\">\n",
+              "        \n",
+              "  <svg xmlns=\"http://www.w3.org/2000/svg\" height=\"24px\"viewBox=\"0 0 24 24\"\n",
+              "       width=\"24px\">\n",
+              "    <path d=\"M0 0h24v24H0V0z\" fill=\"none\"/>\n",
+              "    <path d=\"M18.56 5.44l.94 2.06.94-2.06 2.06-.94-2.06-.94-.94-2.06-.94 2.06-2.06.94zm-11 1L8.5 8.5l.94-2.06 2.06-.94-2.06-.94L8.5 2.5l-.94 2.06-2.06.94zm10 10l.94 2.06.94-2.06 2.06-.94-2.06-.94-.94-2.06-.94 2.06-2.06.94z\"/><path d=\"M17.41 7.96l-1.37-1.37c-.4-.4-.92-.59-1.43-.59-.52 0-1.04.2-1.43.59L10.3 9.45l-7.72 7.72c-.78.78-.78 2.05 0 2.83L4 21.41c.39.39.9.59 1.41.59.51 0 1.02-.2 1.41-.59l7.78-7.78 2.81-2.81c.8-.78.8-2.07 0-2.86zM5.41 20L4 18.59l7.72-7.72 1.47 1.35L5.41 20z\"/>\n",
+              "  </svg>\n",
+              "      </button>\n",
+              "      \n",
+              "  <style>\n",
+              "    .colab-df-container {\n",
+              "      display:flex;\n",
+              "      flex-wrap:wrap;\n",
+              "      gap: 12px;\n",
+              "    }\n",
+              "\n",
+              "    .colab-df-convert {\n",
+              "      background-color: #E8F0FE;\n",
+              "      border: none;\n",
+              "      border-radius: 50%;\n",
+              "      cursor: pointer;\n",
+              "      display: none;\n",
+              "      fill: #1967D2;\n",
+              "      height: 32px;\n",
+              "      padding: 0 0 0 0;\n",
+              "      width: 32px;\n",
+              "    }\n",
+              "\n",
+              "    .colab-df-convert:hover {\n",
+              "      background-color: #E2EBFA;\n",
+              "      box-shadow: 0px 1px 2px rgba(60, 64, 67, 0.3), 0px 1px 3px 1px rgba(60, 64, 67, 0.15);\n",
+              "      fill: #174EA6;\n",
+              "    }\n",
+              "\n",
+              "    [theme=dark] .colab-df-convert {\n",
+              "      background-color: #3B4455;\n",
+              "      fill: #D2E3FC;\n",
+              "    }\n",
+              "\n",
+              "    [theme=dark] .colab-df-convert:hover {\n",
+              "      background-color: #434B5C;\n",
+              "      box-shadow: 0px 1px 3px 1px rgba(0, 0, 0, 0.15);\n",
+              "      filter: drop-shadow(0px 1px 2px rgba(0, 0, 0, 0.3));\n",
+              "      fill: #FFFFFF;\n",
+              "    }\n",
+              "  </style>\n",
+              "\n",
+              "      <script>\n",
+              "        const buttonEl =\n",
+              "          document.querySelector('#df-1947602d-160c-4dc9-a8a0-b7a924d389fa button.colab-df-convert');\n",
+              "        buttonEl.style.display =\n",
+              "          google.colab.kernel.accessAllowed ? 'block' : 'none';\n",
+              "\n",
+              "        async function convertToInteractive(key) {\n",
+              "          const element = document.querySelector('#df-1947602d-160c-4dc9-a8a0-b7a924d389fa');\n",
+              "          const dataTable =\n",
+              "            await google.colab.kernel.invokeFunction('convertToInteractive',\n",
+              "                                                     [key], {});\n",
+              "          if (!dataTable) return;\n",
+              "\n",
+              "          const docLinkHtml = 'Like what you see? Visit the ' +\n",
+              "            '<a target=\"_blank\" href=https://colab.research.google.com/notebooks/data_table.ipynb>data table notebook</a>'\n",
+              "            + ' to learn more about interactive tables.';\n",
+              "          element.innerHTML = '';\n",
+              "          dataTable['output_type'] = 'display_data';\n",
+              "          await google.colab.output.renderOutput(dataTable, element);\n",
+              "          const docLink = document.createElement('div');\n",
+              "          docLink.innerHTML = docLinkHtml;\n",
+              "          element.appendChild(docLink);\n",
+              "        }\n",
+              "      </script>\n",
+              "    </div>\n",
+              "  </div>\n",
+              "  "
+            ]
+          },
+          "metadata": {},
+          "execution_count": 28
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# Data visualization\n",
+        "\n",
+        "import matplotlib.pyplot as plt\n",
+        "import seaborn as sns\n",
+        "sns.lineplot(x = rfdepths,  y = rfscores['Test Score'])\n",
+        "plt.title('R2 vs. Depth', fontsize = 15)\n",
+        "plt.xlabel('Depth')\n",
+        "plt.ylabel('R2');\n",
+        "plt.show()\n",
+        "print(f'\\nThe optimal depth is {rfbest.index[0]}')"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 332
+        },
+        "id": "hrcHBb3SXFtg",
+        "outputId": "4b26cbf1-21af-4416-fe9b-0f884a7b69fc"
+      },
+      "execution_count": 29,
+      "outputs": [
+        {
+          "output_type": "display_data",
+          "data": {
+            "text/plain": [
+              "<Figure size 432x288 with 1 Axes>"
+            ],
+            "image/png": "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\n"
+          },
+          "metadata": {
+            "needs_background": "light"
+          }
+        },
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "\n",
+            "The optimal depth is 5\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# Saving index of best score\n",
+        "rfbest_depth = rfbest.index[0]"
+      ],
+      "metadata": {
+        "id": "MybyRYcKXtJY"
+      },
+      "execution_count": 30,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# Instantiating model of best depth\n",
+        "rf_tuned = RandomForestRegressor(max_depth = rfbest_depth)\n",
+        "\n",
+        "# Creating pipeline\n",
+        "rftuned_pipe = make_pipeline(preproc, rf_tuned)\n",
+        "\n",
+        "# Fit model\n",
+        "rftuned_pipe.fit(X_train, y_train)"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 227
+        },
+        "id": "Uj8ClTU2gMXa",
+        "outputId": "c505d110-0387-4403-ef45-04b4753ae50f"
+      },
+      "execution_count": 31,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "Pipeline(steps=[('columntransformer',\n",
+              "                 ColumnTransformer(transformers=[('pipeline-1',\n",
+              "                                                  Pipeline(steps=[('simpleimputer',\n",
+              "                                                                   SimpleImputer()),\n",
+              "                                                                  ('standardscaler',\n",
+              "                                                                   StandardScaler())]),\n",
+              "                                                  <sklearn.compose._column_transformer.make_column_selector object at 0x7f099c5abb80>),\n",
+              "                                                 ('pipeline-2',\n",
+              "                                                  Pipeline(steps=[('simpleimputer',\n",
+              "                                                                   SimpleImputer(strategy='most_frequent')),\n",
+              "                                                                  ('onehotencoder',\n",
+              "                                                                   OneHotEncoder(handle_unknown='ignore',\n",
+              "                                                                                 sparse_output=False))]),\n",
+              "                                                  <sklearn.compose._column_transformer.make_column_selector object at 0x7f099c5abdc0>)])),\n",
+              "                ('randomforestregressor', RandomForestRegressor(max_depth=5))])"
+            ],
+            "text/html": [
+              "<style>#sk-container-id-7 {color: black;background-color: white;}#sk-container-id-7 pre{padding: 0;}#sk-container-id-7 div.sk-toggleable {background-color: white;}#sk-container-id-7 label.sk-toggleable__label {cursor: pointer;display: block;width: 100%;margin-bottom: 0;padding: 0.3em;box-sizing: border-box;text-align: center;}#sk-container-id-7 label.sk-toggleable__label-arrow:before {content: \"▸\";float: left;margin-right: 0.25em;color: #696969;}#sk-container-id-7 label.sk-toggleable__label-arrow:hover:before {color: black;}#sk-container-id-7 div.sk-estimator:hover label.sk-toggleable__label-arrow:before {color: black;}#sk-container-id-7 div.sk-toggleable__content {max-height: 0;max-width: 0;overflow: hidden;text-align: left;background-color: #f0f8ff;}#sk-container-id-7 div.sk-toggleable__content pre {margin: 0.2em;color: black;border-radius: 0.25em;background-color: #f0f8ff;}#sk-container-id-7 input.sk-toggleable__control:checked~div.sk-toggleable__content {max-height: 200px;max-width: 100%;overflow: auto;}#sk-container-id-7 input.sk-toggleable__control:checked~label.sk-toggleable__label-arrow:before {content: \"▾\";}#sk-container-id-7 div.sk-estimator input.sk-toggleable__control:checked~label.sk-toggleable__label {background-color: #d4ebff;}#sk-container-id-7 div.sk-label input.sk-toggleable__control:checked~label.sk-toggleable__label {background-color: #d4ebff;}#sk-container-id-7 input.sk-hidden--visually {border: 0;clip: rect(1px 1px 1px 1px);clip: rect(1px, 1px, 1px, 1px);height: 1px;margin: -1px;overflow: hidden;padding: 0;position: absolute;width: 1px;}#sk-container-id-7 div.sk-estimator {font-family: monospace;background-color: #f0f8ff;border: 1px dotted black;border-radius: 0.25em;box-sizing: border-box;margin-bottom: 0.5em;}#sk-container-id-7 div.sk-estimator:hover {background-color: #d4ebff;}#sk-container-id-7 div.sk-parallel-item::after {content: \"\";width: 100%;border-bottom: 1px solid gray;flex-grow: 1;}#sk-container-id-7 div.sk-label:hover label.sk-toggleable__label {background-color: #d4ebff;}#sk-container-id-7 div.sk-serial::before {content: \"\";position: absolute;border-left: 1px solid gray;box-sizing: border-box;top: 0;bottom: 0;left: 50%;z-index: 0;}#sk-container-id-7 div.sk-serial {display: flex;flex-direction: column;align-items: center;background-color: white;padding-right: 0.2em;padding-left: 0.2em;position: relative;}#sk-container-id-7 div.sk-item {position: relative;z-index: 1;}#sk-container-id-7 div.sk-parallel {display: flex;align-items: stretch;justify-content: center;background-color: white;position: relative;}#sk-container-id-7 div.sk-item::before, #sk-container-id-7 div.sk-parallel-item::before {content: \"\";position: absolute;border-left: 1px solid gray;box-sizing: border-box;top: 0;bottom: 0;left: 50%;z-index: -1;}#sk-container-id-7 div.sk-parallel-item {display: flex;flex-direction: column;z-index: 1;position: relative;background-color: white;}#sk-container-id-7 div.sk-parallel-item:first-child::after {align-self: flex-end;width: 50%;}#sk-container-id-7 div.sk-parallel-item:last-child::after {align-self: flex-start;width: 50%;}#sk-container-id-7 div.sk-parallel-item:only-child::after {width: 0;}#sk-container-id-7 div.sk-dashed-wrapped {border: 1px dashed gray;margin: 0 0.4em 0.5em 0.4em;box-sizing: border-box;padding-bottom: 0.4em;background-color: white;}#sk-container-id-7 div.sk-label label {font-family: monospace;font-weight: bold;display: inline-block;line-height: 1.2em;}#sk-container-id-7 div.sk-label-container {text-align: center;}#sk-container-id-7 div.sk-container {/* jupyter's `normalize.less` sets `[hidden] { display: none; }` but bootstrap.min.css set `[hidden] { display: none !important; }` so we also need the `!important` here to be able to override the default hidden behavior on the sphinx rendered scikit-learn.org. See: https://github.com/scikit-learn/scikit-learn/issues/21755 */display: inline-block !important;position: relative;}#sk-container-id-7 div.sk-text-repr-fallback {display: none;}</style><div id=\"sk-container-id-7\" class=\"sk-top-container\"><div class=\"sk-text-repr-fallback\"><pre>Pipeline(steps=[(&#x27;columntransformer&#x27;,\n",
+              "                 ColumnTransformer(transformers=[(&#x27;pipeline-1&#x27;,\n",
+              "                                                  Pipeline(steps=[(&#x27;simpleimputer&#x27;,\n",
+              "                                                                   SimpleImputer()),\n",
+              "                                                                  (&#x27;standardscaler&#x27;,\n",
+              "                                                                   StandardScaler())]),\n",
+              "                                                  &lt;sklearn.compose._column_transformer.make_column_selector object at 0x7f099c5abb80&gt;),\n",
+              "                                                 (&#x27;pipeline-2&#x27;,\n",
+              "                                                  Pipeline(steps=[(&#x27;simpleimputer&#x27;,\n",
+              "                                                                   SimpleImputer(strategy=&#x27;most_frequent&#x27;)),\n",
+              "                                                                  (&#x27;onehotencoder&#x27;,\n",
+              "                                                                   OneHotEncoder(handle_unknown=&#x27;ignore&#x27;,\n",
+              "                                                                                 sparse_output=False))]),\n",
+              "                                                  &lt;sklearn.compose._column_transformer.make_column_selector object at 0x7f099c5abdc0&gt;)])),\n",
+              "                (&#x27;randomforestregressor&#x27;, RandomForestRegressor(max_depth=5))])</pre><b>In a Jupyter environment, please rerun this cell to show the HTML representation or trust the notebook. <br />On GitHub, the HTML representation is unable to render, please try loading this page with nbviewer.org.</b></div><div class=\"sk-container\" hidden><div class=\"sk-item sk-dashed-wrapped\"><div class=\"sk-label-container\"><div class=\"sk-label sk-toggleable\"><input class=\"sk-toggleable__control sk-hidden--visually\" id=\"sk-estimator-id-39\" type=\"checkbox\" ><label for=\"sk-estimator-id-39\" class=\"sk-toggleable__label sk-toggleable__label-arrow\">Pipeline</label><div class=\"sk-toggleable__content\"><pre>Pipeline(steps=[(&#x27;columntransformer&#x27;,\n",
+              "                 ColumnTransformer(transformers=[(&#x27;pipeline-1&#x27;,\n",
+              "                                                  Pipeline(steps=[(&#x27;simpleimputer&#x27;,\n",
+              "                                                                   SimpleImputer()),\n",
+              "                                                                  (&#x27;standardscaler&#x27;,\n",
+              "                                                                   StandardScaler())]),\n",
+              "                                                  &lt;sklearn.compose._column_transformer.make_column_selector object at 0x7f099c5abb80&gt;),\n",
+              "                                                 (&#x27;pipeline-2&#x27;,\n",
+              "                                                  Pipeline(steps=[(&#x27;simpleimputer&#x27;,\n",
+              "                                                                   SimpleImputer(strategy=&#x27;most_frequent&#x27;)),\n",
+              "                                                                  (&#x27;onehotencoder&#x27;,\n",
+              "                                                                   OneHotEncoder(handle_unknown=&#x27;ignore&#x27;,\n",
+              "                                                                                 sparse_output=False))]),\n",
+              "                                                  &lt;sklearn.compose._column_transformer.make_column_selector object at 0x7f099c5abdc0&gt;)])),\n",
+              "                (&#x27;randomforestregressor&#x27;, RandomForestRegressor(max_depth=5))])</pre></div></div></div><div class=\"sk-serial\"><div class=\"sk-item sk-dashed-wrapped\"><div class=\"sk-label-container\"><div class=\"sk-label sk-toggleable\"><input class=\"sk-toggleable__control sk-hidden--visually\" id=\"sk-estimator-id-40\" type=\"checkbox\" ><label for=\"sk-estimator-id-40\" class=\"sk-toggleable__label sk-toggleable__label-arrow\">columntransformer: ColumnTransformer</label><div class=\"sk-toggleable__content\"><pre>ColumnTransformer(transformers=[(&#x27;pipeline-1&#x27;,\n",
+              "                                 Pipeline(steps=[(&#x27;simpleimputer&#x27;,\n",
+              "                                                  SimpleImputer()),\n",
+              "                                                 (&#x27;standardscaler&#x27;,\n",
+              "                                                  StandardScaler())]),\n",
+              "                                 &lt;sklearn.compose._column_transformer.make_column_selector object at 0x7f099c5abb80&gt;),\n",
+              "                                (&#x27;pipeline-2&#x27;,\n",
+              "                                 Pipeline(steps=[(&#x27;simpleimputer&#x27;,\n",
+              "                                                  SimpleImputer(strategy=&#x27;most_frequent&#x27;)),\n",
+              "                                                 (&#x27;onehotencoder&#x27;,\n",
+              "                                                  OneHotEncoder(handle_unknown=&#x27;ignore&#x27;,\n",
+              "                                                                sparse_output=False))]),\n",
+              "                                 &lt;sklearn.compose._column_transformer.make_column_selector object at 0x7f099c5abdc0&gt;)])</pre></div></div></div><div class=\"sk-parallel\"><div class=\"sk-parallel-item\"><div class=\"sk-item\"><div class=\"sk-label-container\"><div class=\"sk-label sk-toggleable\"><input class=\"sk-toggleable__control sk-hidden--visually\" id=\"sk-estimator-id-41\" type=\"checkbox\" ><label for=\"sk-estimator-id-41\" class=\"sk-toggleable__label sk-toggleable__label-arrow\">pipeline-1</label><div class=\"sk-toggleable__content\"><pre>&lt;sklearn.compose._column_transformer.make_column_selector object at 0x7f099c5abb80&gt;</pre></div></div></div><div class=\"sk-serial\"><div class=\"sk-item\"><div class=\"sk-serial\"><div class=\"sk-item\"><div class=\"sk-estimator sk-toggleable\"><input class=\"sk-toggleable__control sk-hidden--visually\" id=\"sk-estimator-id-42\" type=\"checkbox\" ><label for=\"sk-estimator-id-42\" class=\"sk-toggleable__label sk-toggleable__label-arrow\">SimpleImputer</label><div class=\"sk-toggleable__content\"><pre>SimpleImputer()</pre></div></div></div><div class=\"sk-item\"><div class=\"sk-estimator sk-toggleable\"><input class=\"sk-toggleable__control sk-hidden--visually\" id=\"sk-estimator-id-43\" type=\"checkbox\" ><label for=\"sk-estimator-id-43\" class=\"sk-toggleable__label sk-toggleable__label-arrow\">StandardScaler</label><div class=\"sk-toggleable__content\"><pre>StandardScaler()</pre></div></div></div></div></div></div></div></div><div class=\"sk-parallel-item\"><div class=\"sk-item\"><div class=\"sk-label-container\"><div class=\"sk-label sk-toggleable\"><input class=\"sk-toggleable__control sk-hidden--visually\" id=\"sk-estimator-id-44\" type=\"checkbox\" ><label for=\"sk-estimator-id-44\" class=\"sk-toggleable__label sk-toggleable__label-arrow\">pipeline-2</label><div class=\"sk-toggleable__content\"><pre>&lt;sklearn.compose._column_transformer.make_column_selector object at 0x7f099c5abdc0&gt;</pre></div></div></div><div class=\"sk-serial\"><div class=\"sk-item\"><div class=\"sk-serial\"><div class=\"sk-item\"><div class=\"sk-estimator sk-toggleable\"><input class=\"sk-toggleable__control sk-hidden--visually\" id=\"sk-estimator-id-45\" type=\"checkbox\" ><label for=\"sk-estimator-id-45\" class=\"sk-toggleable__label sk-toggleable__label-arrow\">SimpleImputer</label><div class=\"sk-toggleable__content\"><pre>SimpleImputer(strategy=&#x27;most_frequent&#x27;)</pre></div></div></div><div class=\"sk-item\"><div class=\"sk-estimator sk-toggleable\"><input class=\"sk-toggleable__control sk-hidden--visually\" id=\"sk-estimator-id-46\" type=\"checkbox\" ><label for=\"sk-estimator-id-46\" class=\"sk-toggleable__label sk-toggleable__label-arrow\">OneHotEncoder</label><div class=\"sk-toggleable__content\"><pre>OneHotEncoder(handle_unknown=&#x27;ignore&#x27;, sparse_output=False)</pre></div></div></div></div></div></div></div></div></div></div><div class=\"sk-item\"><div class=\"sk-estimator sk-toggleable\"><input class=\"sk-toggleable__control sk-hidden--visually\" id=\"sk-estimator-id-47\" type=\"checkbox\" ><label for=\"sk-estimator-id-47\" class=\"sk-toggleable__label sk-toggleable__label-arrow\">RandomForestRegressor</label><div class=\"sk-toggleable__content\"><pre>RandomForestRegressor(max_depth=5)</pre></div></div></div></div></div></div></div>"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 31
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# Display model metrics\n",
+        "rftuned = model_metrics(rftuned_pipe, X_train=X_train, y_train=y_train, \n",
+        "                          X_test=X_test, y_test=y_test, \n",
+        "                           model_name='Random Forest')\n",
+        "scores_df = pd.concat([scores_df, rftuned], axis = 1)"
+      ],
+      "metadata": {
+        "id": "FHVE_agNXwfW"
+      },
+      "execution_count": 32,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "scores_df"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 175
+        },
+        "id": "XX_NWx3vXyn3",
+        "outputId": "c7079a10-b2e9-4671-8576-b65d5da0fb31"
+      },
+      "execution_count": 33,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "           Linear Regression Random Forest\n",
+              "train_RMSE         1139.1332     1074.4923\n",
+              "test_RMSE          1092.7262     1047.1732\n",
+              "train_R2            0.561533      0.609883\n",
+              "test_R2             0.567213      0.602544"
+            ],
+            "text/html": [
+              "\n",
+              "  <div id=\"df-eee1fe38-6a3c-4f74-b753-4f8961bd1bc9\">\n",
+              "    <div class=\"colab-df-container\">\n",
+              "      <div>\n",
+              "<style scoped>\n",
+              "    .dataframe tbody tr th:only-of-type {\n",
+              "        vertical-align: middle;\n",
+              "    }\n",
+              "\n",
+              "    .dataframe tbody tr th {\n",
+              "        vertical-align: top;\n",
+              "    }\n",
+              "\n",
+              "    .dataframe thead th {\n",
+              "        text-align: right;\n",
+              "    }\n",
+              "</style>\n",
+              "<table border=\"1\" class=\"dataframe\">\n",
+              "  <thead>\n",
+              "    <tr style=\"text-align: right;\">\n",
+              "      <th></th>\n",
+              "      <th>Linear Regression</th>\n",
+              "      <th>Random Forest</th>\n",
+              "    </tr>\n",
+              "  </thead>\n",
+              "  <tbody>\n",
+              "    <tr>\n",
+              "      <th>train_RMSE</th>\n",
+              "      <td>1139.1332</td>\n",
+              "      <td>1074.4923</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>test_RMSE</th>\n",
+              "      <td>1092.7262</td>\n",
+              "      <td>1047.1732</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>train_R2</th>\n",
+              "      <td>0.561533</td>\n",
+              "      <td>0.609883</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>test_R2</th>\n",
+              "      <td>0.567213</td>\n",
+              "      <td>0.602544</td>\n",
+              "    </tr>\n",
+              "  </tbody>\n",
+              "</table>\n",
+              "</div>\n",
+              "      <button class=\"colab-df-convert\" onclick=\"convertToInteractive('df-eee1fe38-6a3c-4f74-b753-4f8961bd1bc9')\"\n",
+              "              title=\"Convert this dataframe to an interactive table.\"\n",
+              "              style=\"display:none;\">\n",
+              "        \n",
+              "  <svg xmlns=\"http://www.w3.org/2000/svg\" height=\"24px\"viewBox=\"0 0 24 24\"\n",
+              "       width=\"24px\">\n",
+              "    <path d=\"M0 0h24v24H0V0z\" fill=\"none\"/>\n",
+              "    <path d=\"M18.56 5.44l.94 2.06.94-2.06 2.06-.94-2.06-.94-.94-2.06-.94 2.06-2.06.94zm-11 1L8.5 8.5l.94-2.06 2.06-.94-2.06-.94L8.5 2.5l-.94 2.06-2.06.94zm10 10l.94 2.06.94-2.06 2.06-.94-2.06-.94-.94-2.06-.94 2.06-2.06.94z\"/><path d=\"M17.41 7.96l-1.37-1.37c-.4-.4-.92-.59-1.43-.59-.52 0-1.04.2-1.43.59L10.3 9.45l-7.72 7.72c-.78.78-.78 2.05 0 2.83L4 21.41c.39.39.9.59 1.41.59.51 0 1.02-.2 1.41-.59l7.78-7.78 2.81-2.81c.8-.78.8-2.07 0-2.86zM5.41 20L4 18.59l7.72-7.72 1.47 1.35L5.41 20z\"/>\n",
+              "  </svg>\n",
+              "      </button>\n",
+              "      \n",
+              "  <style>\n",
+              "    .colab-df-container {\n",
+              "      display:flex;\n",
+              "      flex-wrap:wrap;\n",
+              "      gap: 12px;\n",
+              "    }\n",
+              "\n",
+              "    .colab-df-convert {\n",
+              "      background-color: #E8F0FE;\n",
+              "      border: none;\n",
+              "      border-radius: 50%;\n",
+              "      cursor: pointer;\n",
+              "      display: none;\n",
+              "      fill: #1967D2;\n",
+              "      height: 32px;\n",
+              "      padding: 0 0 0 0;\n",
+              "      width: 32px;\n",
+              "    }\n",
+              "\n",
+              "    .colab-df-convert:hover {\n",
+              "      background-color: #E2EBFA;\n",
+              "      box-shadow: 0px 1px 2px rgba(60, 64, 67, 0.3), 0px 1px 3px 1px rgba(60, 64, 67, 0.15);\n",
+              "      fill: #174EA6;\n",
+              "    }\n",
+              "\n",
+              "    [theme=dark] .colab-df-convert {\n",
+              "      background-color: #3B4455;\n",
+              "      fill: #D2E3FC;\n",
+              "    }\n",
+              "\n",
+              "    [theme=dark] .colab-df-convert:hover {\n",
+              "      background-color: #434B5C;\n",
+              "      box-shadow: 0px 1px 3px 1px rgba(0, 0, 0, 0.15);\n",
+              "      filter: drop-shadow(0px 1px 2px rgba(0, 0, 0, 0.3));\n",
+              "      fill: #FFFFFF;\n",
+              "    }\n",
+              "  </style>\n",
+              "\n",
+              "      <script>\n",
+              "        const buttonEl =\n",
+              "          document.querySelector('#df-eee1fe38-6a3c-4f74-b753-4f8961bd1bc9 button.colab-df-convert');\n",
+              "        buttonEl.style.display =\n",
+              "          google.colab.kernel.accessAllowed ? 'block' : 'none';\n",
+              "\n",
+              "        async function convertToInteractive(key) {\n",
+              "          const element = document.querySelector('#df-eee1fe38-6a3c-4f74-b753-4f8961bd1bc9');\n",
+              "          const dataTable =\n",
+              "            await google.colab.kernel.invokeFunction('convertToInteractive',\n",
+              "                                                     [key], {});\n",
+              "          if (!dataTable) return;\n",
+              "\n",
+              "          const docLinkHtml = 'Like what you see? Visit the ' +\n",
+              "            '<a target=\"_blank\" href=https://colab.research.google.com/notebooks/data_table.ipynb>data table notebook</a>'\n",
+              "            + ' to learn more about interactive tables.';\n",
+              "          element.innerHTML = '';\n",
+              "          dataTable['output_type'] = 'display_data';\n",
+              "          await google.colab.output.renderOutput(dataTable, element);\n",
+              "          const docLink = document.createElement('div');\n",
+              "          docLink.innerHTML = docLinkHtml;\n",
+              "          element.appendChild(docLink);\n",
+              "        }\n",
+              "      </script>\n",
+              "    </div>\n",
+              "  </div>\n",
+              "  "
+            ]
+          },
+          "metadata": {},
+          "execution_count": 33
+        }
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "## Overall I would recommend the Random Forest Model.\n",
+        "- Though neither model fits the data as well as it could, the R2 and RMSE scores on the Random Forest are just slightly better. The r2 shows that that about 60% of the testing data fits within the model, wh ile the RMSE shows it can predict sales within $1,047.\n",
+        "\n",
+        "- The models may not be ideal for a number of reasons, some including too simple of a model, not enough data, or features that do not correlate well with the target."
+      ],
+      "metadata": {
+        "id": "YdgFcVGjygvy"
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [],
+      "metadata": {
+        "id": "v5N0OLy1DrPB"
+      },
+      "execution_count": 33,
+      "outputs": []
+    }
+  ]
+}
