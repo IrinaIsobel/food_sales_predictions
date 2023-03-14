@@ -1,0 +1,2407 @@
+{
+  "nbformat": 4,
+  "nbformat_minor": 0,
+  "metadata": {
+    "colab": {
+      "provenance": [],
+      "authorship_tag": "ABX9TyNSRNrhPi4hHV9qljO2CPr8",
+      "include_colab_link": true
+    },
+    "kernelspec": {
+      "name": "python3",
+      "display_name": "Python 3"
+    },
+    "language_info": {
+      "name": "python"
+    }
+  },
+  "cells": [
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "view-in-github",
+        "colab_type": "text"
+      },
+      "source": [
+        "<a href=\"https://colab.research.google.com/github/IrinaIsobel/food_sales_predictions/blob/main/data_cleaning\" target=\"_parent\"><img src=\"https://colab.research.google.com/assets/colab-badge.svg\" alt=\"Open In Colab\"/></a>"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 357
+        },
+        "id": "V5KGEi_2csat",
+        "outputId": "a743dbf6-8131-4103-d29d-8a5caf804928"
+      },
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "  Item_Identifier  Item_Weight Item_Fat_Content  Item_Visibility  \\\n",
+              "0           FDA15         9.30          Low Fat         0.016047   \n",
+              "1           DRC01         5.92          Regular         0.019278   \n",
+              "2           FDN15        17.50          Low Fat         0.016760   \n",
+              "3           FDX07        19.20          Regular         0.000000   \n",
+              "4           NCD19         8.93          Low Fat         0.000000   \n",
+              "\n",
+              "               Item_Type  Item_MRP Outlet_Identifier  \\\n",
+              "0                  Dairy  249.8092            OUT049   \n",
+              "1            Soft Drinks   48.2692            OUT018   \n",
+              "2                   Meat  141.6180            OUT049   \n",
+              "3  Fruits and Vegetables  182.0950            OUT010   \n",
+              "4              Household   53.8614            OUT013   \n",
+              "\n",
+              "   Outlet_Establishment_Year Outlet_Size Outlet_Location_Type  \\\n",
+              "0                       1999      Medium               Tier 1   \n",
+              "1                       2009      Medium               Tier 3   \n",
+              "2                       1999      Medium               Tier 1   \n",
+              "3                       1998         NaN               Tier 3   \n",
+              "4                       1987        High               Tier 3   \n",
+              "\n",
+              "         Outlet_Type  Item_Outlet_Sales  \n",
+              "0  Supermarket Type1          3735.1380  \n",
+              "1  Supermarket Type2           443.4228  \n",
+              "2  Supermarket Type1          2097.2700  \n",
+              "3      Grocery Store           732.3800  \n",
+              "4  Supermarket Type1           994.7052  "
+            ],
+            "text/html": [
+              "\n",
+              "  <div id=\"df-7cd4667f-6652-41cb-bd51-732bc8c42dc0\">\n",
+              "    <div class=\"colab-df-container\">\n",
+              "      <div>\n",
+              "<style scoped>\n",
+              "    .dataframe tbody tr th:only-of-type {\n",
+              "        vertical-align: middle;\n",
+              "    }\n",
+              "\n",
+              "    .dataframe tbody tr th {\n",
+              "        vertical-align: top;\n",
+              "    }\n",
+              "\n",
+              "    .dataframe thead th {\n",
+              "        text-align: right;\n",
+              "    }\n",
+              "</style>\n",
+              "<table border=\"1\" class=\"dataframe\">\n",
+              "  <thead>\n",
+              "    <tr style=\"text-align: right;\">\n",
+              "      <th></th>\n",
+              "      <th>Item_Identifier</th>\n",
+              "      <th>Item_Weight</th>\n",
+              "      <th>Item_Fat_Content</th>\n",
+              "      <th>Item_Visibility</th>\n",
+              "      <th>Item_Type</th>\n",
+              "      <th>Item_MRP</th>\n",
+              "      <th>Outlet_Identifier</th>\n",
+              "      <th>Outlet_Establishment_Year</th>\n",
+              "      <th>Outlet_Size</th>\n",
+              "      <th>Outlet_Location_Type</th>\n",
+              "      <th>Outlet_Type</th>\n",
+              "      <th>Item_Outlet_Sales</th>\n",
+              "    </tr>\n",
+              "  </thead>\n",
+              "  <tbody>\n",
+              "    <tr>\n",
+              "      <th>0</th>\n",
+              "      <td>FDA15</td>\n",
+              "      <td>9.30</td>\n",
+              "      <td>Low Fat</td>\n",
+              "      <td>0.016047</td>\n",
+              "      <td>Dairy</td>\n",
+              "      <td>249.8092</td>\n",
+              "      <td>OUT049</td>\n",
+              "      <td>1999</td>\n",
+              "      <td>Medium</td>\n",
+              "      <td>Tier 1</td>\n",
+              "      <td>Supermarket Type1</td>\n",
+              "      <td>3735.1380</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>1</th>\n",
+              "      <td>DRC01</td>\n",
+              "      <td>5.92</td>\n",
+              "      <td>Regular</td>\n",
+              "      <td>0.019278</td>\n",
+              "      <td>Soft Drinks</td>\n",
+              "      <td>48.2692</td>\n",
+              "      <td>OUT018</td>\n",
+              "      <td>2009</td>\n",
+              "      <td>Medium</td>\n",
+              "      <td>Tier 3</td>\n",
+              "      <td>Supermarket Type2</td>\n",
+              "      <td>443.4228</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>2</th>\n",
+              "      <td>FDN15</td>\n",
+              "      <td>17.50</td>\n",
+              "      <td>Low Fat</td>\n",
+              "      <td>0.016760</td>\n",
+              "      <td>Meat</td>\n",
+              "      <td>141.6180</td>\n",
+              "      <td>OUT049</td>\n",
+              "      <td>1999</td>\n",
+              "      <td>Medium</td>\n",
+              "      <td>Tier 1</td>\n",
+              "      <td>Supermarket Type1</td>\n",
+              "      <td>2097.2700</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>3</th>\n",
+              "      <td>FDX07</td>\n",
+              "      <td>19.20</td>\n",
+              "      <td>Regular</td>\n",
+              "      <td>0.000000</td>\n",
+              "      <td>Fruits and Vegetables</td>\n",
+              "      <td>182.0950</td>\n",
+              "      <td>OUT010</td>\n",
+              "      <td>1998</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>Tier 3</td>\n",
+              "      <td>Grocery Store</td>\n",
+              "      <td>732.3800</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>4</th>\n",
+              "      <td>NCD19</td>\n",
+              "      <td>8.93</td>\n",
+              "      <td>Low Fat</td>\n",
+              "      <td>0.000000</td>\n",
+              "      <td>Household</td>\n",
+              "      <td>53.8614</td>\n",
+              "      <td>OUT013</td>\n",
+              "      <td>1987</td>\n",
+              "      <td>High</td>\n",
+              "      <td>Tier 3</td>\n",
+              "      <td>Supermarket Type1</td>\n",
+              "      <td>994.7052</td>\n",
+              "    </tr>\n",
+              "  </tbody>\n",
+              "</table>\n",
+              "</div>\n",
+              "      <button class=\"colab-df-convert\" onclick=\"convertToInteractive('df-7cd4667f-6652-41cb-bd51-732bc8c42dc0')\"\n",
+              "              title=\"Convert this dataframe to an interactive table.\"\n",
+              "              style=\"display:none;\">\n",
+              "        \n",
+              "  <svg xmlns=\"http://www.w3.org/2000/svg\" height=\"24px\"viewBox=\"0 0 24 24\"\n",
+              "       width=\"24px\">\n",
+              "    <path d=\"M0 0h24v24H0V0z\" fill=\"none\"/>\n",
+              "    <path d=\"M18.56 5.44l.94 2.06.94-2.06 2.06-.94-2.06-.94-.94-2.06-.94 2.06-2.06.94zm-11 1L8.5 8.5l.94-2.06 2.06-.94-2.06-.94L8.5 2.5l-.94 2.06-2.06.94zm10 10l.94 2.06.94-2.06 2.06-.94-2.06-.94-.94-2.06-.94 2.06-2.06.94z\"/><path d=\"M17.41 7.96l-1.37-1.37c-.4-.4-.92-.59-1.43-.59-.52 0-1.04.2-1.43.59L10.3 9.45l-7.72 7.72c-.78.78-.78 2.05 0 2.83L4 21.41c.39.39.9.59 1.41.59.51 0 1.02-.2 1.41-.59l7.78-7.78 2.81-2.81c.8-.78.8-2.07 0-2.86zM5.41 20L4 18.59l7.72-7.72 1.47 1.35L5.41 20z\"/>\n",
+              "  </svg>\n",
+              "      </button>\n",
+              "      \n",
+              "  <style>\n",
+              "    .colab-df-container {\n",
+              "      display:flex;\n",
+              "      flex-wrap:wrap;\n",
+              "      gap: 12px;\n",
+              "    }\n",
+              "\n",
+              "    .colab-df-convert {\n",
+              "      background-color: #E8F0FE;\n",
+              "      border: none;\n",
+              "      border-radius: 50%;\n",
+              "      cursor: pointer;\n",
+              "      display: none;\n",
+              "      fill: #1967D2;\n",
+              "      height: 32px;\n",
+              "      padding: 0 0 0 0;\n",
+              "      width: 32px;\n",
+              "    }\n",
+              "\n",
+              "    .colab-df-convert:hover {\n",
+              "      background-color: #E2EBFA;\n",
+              "      box-shadow: 0px 1px 2px rgba(60, 64, 67, 0.3), 0px 1px 3px 1px rgba(60, 64, 67, 0.15);\n",
+              "      fill: #174EA6;\n",
+              "    }\n",
+              "\n",
+              "    [theme=dark] .colab-df-convert {\n",
+              "      background-color: #3B4455;\n",
+              "      fill: #D2E3FC;\n",
+              "    }\n",
+              "\n",
+              "    [theme=dark] .colab-df-convert:hover {\n",
+              "      background-color: #434B5C;\n",
+              "      box-shadow: 0px 1px 3px 1px rgba(0, 0, 0, 0.15);\n",
+              "      filter: drop-shadow(0px 1px 2px rgba(0, 0, 0, 0.3));\n",
+              "      fill: #FFFFFF;\n",
+              "    }\n",
+              "  </style>\n",
+              "\n",
+              "      <script>\n",
+              "        const buttonEl =\n",
+              "          document.querySelector('#df-7cd4667f-6652-41cb-bd51-732bc8c42dc0 button.colab-df-convert');\n",
+              "        buttonEl.style.display =\n",
+              "          google.colab.kernel.accessAllowed ? 'block' : 'none';\n",
+              "\n",
+              "        async function convertToInteractive(key) {\n",
+              "          const element = document.querySelector('#df-7cd4667f-6652-41cb-bd51-732bc8c42dc0');\n",
+              "          const dataTable =\n",
+              "            await google.colab.kernel.invokeFunction('convertToInteractive',\n",
+              "                                                     [key], {});\n",
+              "          if (!dataTable) return;\n",
+              "\n",
+              "          const docLinkHtml = 'Like what you see? Visit the ' +\n",
+              "            '<a target=\"_blank\" href=https://colab.research.google.com/notebooks/data_table.ipynb>data table notebook</a>'\n",
+              "            + ' to learn more about interactive tables.';\n",
+              "          element.innerHTML = '';\n",
+              "          dataTable['output_type'] = 'display_data';\n",
+              "          await google.colab.output.renderOutput(dataTable, element);\n",
+              "          const docLink = document.createElement('div');\n",
+              "          docLink.innerHTML = docLinkHtml;\n",
+              "          element.appendChild(docLink);\n",
+              "        }\n",
+              "      </script>\n",
+              "    </div>\n",
+              "  </div>\n",
+              "  "
+            ]
+          },
+          "metadata": {},
+          "execution_count": 1
+        }
+      ],
+      "source": [
+        "import pandas as pd\n",
+        "\n",
+        "data = pd.read_csv('https://docs.google.com/spreadsheets/d/e/2PACX-1vSneA58lbwC6aQ6kDKUMgY7t3V_fVQkMF6n-wXIBWpvzHH20Rx0UDQYufcWhZ7TTdVUjrPwabuKua-C/pub?output=csv')\n",
+        "data.head()"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "#Data Cleaning"
+      ],
+      "metadata": {
+        "id": "mBs1V28ieEdM"
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "data.shape"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "vhTOMky5wauo",
+        "outputId": "39fd9981-f9e5-4304-b564-30e9a2154a74"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "(8523, 12)"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 2
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "data.dtypes"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "hsaU9OLq_RIX",
+        "outputId": "5f889471-7e72-4ce6-faeb-361e759ce5e4"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "Item_Identifier               object\n",
+              "Item_Weight                  float64\n",
+              "Item_Fat_Content              object\n",
+              "Item_Visibility              float64\n",
+              "Item_Type                     object\n",
+              "Item_MRP                     float64\n",
+              "Outlet_Identifier             object\n",
+              "Outlet_Establishment_Year      int64\n",
+              "Outlet_Size                   object\n",
+              "Outlet_Location_Type          object\n",
+              "Outlet_Type                   object\n",
+              "Item_Outlet_Sales            float64\n",
+              "dtype: object"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 3
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "data.info()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "YRhd_kVNeBOi",
+        "outputId": "54afe1a6-72d1-42b1-8f1a-0ce3d14b98c7"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "<class 'pandas.core.frame.DataFrame'>\n",
+            "RangeIndex: 8523 entries, 0 to 8522\n",
+            "Data columns (total 12 columns):\n",
+            " #   Column                     Non-Null Count  Dtype  \n",
+            "---  ------                     --------------  -----  \n",
+            " 0   Item_Identifier            8523 non-null   object \n",
+            " 1   Item_Weight                7060 non-null   float64\n",
+            " 2   Item_Fat_Content           8523 non-null   object \n",
+            " 3   Item_Visibility            8523 non-null   float64\n",
+            " 4   Item_Type                  8523 non-null   object \n",
+            " 5   Item_MRP                   8523 non-null   float64\n",
+            " 6   Outlet_Identifier          8523 non-null   object \n",
+            " 7   Outlet_Establishment_Year  8523 non-null   int64  \n",
+            " 8   Outlet_Size                6113 non-null   object \n",
+            " 9   Outlet_Location_Type       8523 non-null   object \n",
+            " 10  Outlet_Type                8523 non-null   object \n",
+            " 11  Item_Outlet_Sales          8523 non-null   float64\n",
+            "dtypes: float64(4), int64(1), object(7)\n",
+            "memory usage: 799.2+ KB\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "data.describe(include = 'all').round(2)"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 476
+        },
+        "id": "dpymeD9seaoO",
+        "outputId": "3b866797-acc7-49cb-f22b-7e16cd9cecb7"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "       Item_Identifier  Item_Weight Item_Fat_Content  Item_Visibility  \\\n",
+              "count             8523      7060.00             8523          8523.00   \n",
+              "unique            1559          NaN                5              NaN   \n",
+              "top              FDW13          NaN          Low Fat              NaN   \n",
+              "freq                10          NaN             5089              NaN   \n",
+              "mean               NaN        12.86              NaN             0.07   \n",
+              "std                NaN         4.64              NaN             0.05   \n",
+              "min                NaN         4.56              NaN             0.00   \n",
+              "25%                NaN         8.77              NaN             0.03   \n",
+              "50%                NaN        12.60              NaN             0.05   \n",
+              "75%                NaN        16.85              NaN             0.09   \n",
+              "max                NaN        21.35              NaN             0.33   \n",
+              "\n",
+              "                    Item_Type  Item_MRP Outlet_Identifier  \\\n",
+              "count                    8523   8523.00              8523   \n",
+              "unique                     16       NaN                10   \n",
+              "top     Fruits and Vegetables       NaN            OUT027   \n",
+              "freq                     1232       NaN               935   \n",
+              "mean                      NaN    140.99               NaN   \n",
+              "std                       NaN     62.28               NaN   \n",
+              "min                       NaN     31.29               NaN   \n",
+              "25%                       NaN     93.83               NaN   \n",
+              "50%                       NaN    143.01               NaN   \n",
+              "75%                       NaN    185.64               NaN   \n",
+              "max                       NaN    266.89               NaN   \n",
+              "\n",
+              "        Outlet_Establishment_Year Outlet_Size Outlet_Location_Type  \\\n",
+              "count                     8523.00        6113                 8523   \n",
+              "unique                        NaN           3                    3   \n",
+              "top                           NaN      Medium               Tier 3   \n",
+              "freq                          NaN        2793                 3350   \n",
+              "mean                      1997.83         NaN                  NaN   \n",
+              "std                          8.37         NaN                  NaN   \n",
+              "min                       1985.00         NaN                  NaN   \n",
+              "25%                       1987.00         NaN                  NaN   \n",
+              "50%                       1999.00         NaN                  NaN   \n",
+              "75%                       2004.00         NaN                  NaN   \n",
+              "max                       2009.00         NaN                  NaN   \n",
+              "\n",
+              "              Outlet_Type  Item_Outlet_Sales  \n",
+              "count                8523            8523.00  \n",
+              "unique                  4                NaN  \n",
+              "top     Supermarket Type1                NaN  \n",
+              "freq                 5577                NaN  \n",
+              "mean                  NaN            2181.29  \n",
+              "std                   NaN            1706.50  \n",
+              "min                   NaN              33.29  \n",
+              "25%                   NaN             834.25  \n",
+              "50%                   NaN            1794.33  \n",
+              "75%                   NaN            3101.30  \n",
+              "max                   NaN           13086.96  "
+            ],
+            "text/html": [
+              "\n",
+              "  <div id=\"df-4b3477f4-4d58-40d4-88fa-50c7dc6b9c64\">\n",
+              "    <div class=\"colab-df-container\">\n",
+              "      <div>\n",
+              "<style scoped>\n",
+              "    .dataframe tbody tr th:only-of-type {\n",
+              "        vertical-align: middle;\n",
+              "    }\n",
+              "\n",
+              "    .dataframe tbody tr th {\n",
+              "        vertical-align: top;\n",
+              "    }\n",
+              "\n",
+              "    .dataframe thead th {\n",
+              "        text-align: right;\n",
+              "    }\n",
+              "</style>\n",
+              "<table border=\"1\" class=\"dataframe\">\n",
+              "  <thead>\n",
+              "    <tr style=\"text-align: right;\">\n",
+              "      <th></th>\n",
+              "      <th>Item_Identifier</th>\n",
+              "      <th>Item_Weight</th>\n",
+              "      <th>Item_Fat_Content</th>\n",
+              "      <th>Item_Visibility</th>\n",
+              "      <th>Item_Type</th>\n",
+              "      <th>Item_MRP</th>\n",
+              "      <th>Outlet_Identifier</th>\n",
+              "      <th>Outlet_Establishment_Year</th>\n",
+              "      <th>Outlet_Size</th>\n",
+              "      <th>Outlet_Location_Type</th>\n",
+              "      <th>Outlet_Type</th>\n",
+              "      <th>Item_Outlet_Sales</th>\n",
+              "    </tr>\n",
+              "  </thead>\n",
+              "  <tbody>\n",
+              "    <tr>\n",
+              "      <th>count</th>\n",
+              "      <td>8523</td>\n",
+              "      <td>7060.00</td>\n",
+              "      <td>8523</td>\n",
+              "      <td>8523.00</td>\n",
+              "      <td>8523</td>\n",
+              "      <td>8523.00</td>\n",
+              "      <td>8523</td>\n",
+              "      <td>8523.00</td>\n",
+              "      <td>6113</td>\n",
+              "      <td>8523</td>\n",
+              "      <td>8523</td>\n",
+              "      <td>8523.00</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>unique</th>\n",
+              "      <td>1559</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>5</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>16</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>10</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>3</td>\n",
+              "      <td>3</td>\n",
+              "      <td>4</td>\n",
+              "      <td>NaN</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>top</th>\n",
+              "      <td>FDW13</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>Low Fat</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>Fruits and Vegetables</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>OUT027</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>Medium</td>\n",
+              "      <td>Tier 3</td>\n",
+              "      <td>Supermarket Type1</td>\n",
+              "      <td>NaN</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>freq</th>\n",
+              "      <td>10</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>5089</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>1232</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>935</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>2793</td>\n",
+              "      <td>3350</td>\n",
+              "      <td>5577</td>\n",
+              "      <td>NaN</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>mean</th>\n",
+              "      <td>NaN</td>\n",
+              "      <td>12.86</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>0.07</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>140.99</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>1997.83</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>2181.29</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>std</th>\n",
+              "      <td>NaN</td>\n",
+              "      <td>4.64</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>0.05</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>62.28</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>8.37</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>1706.50</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>min</th>\n",
+              "      <td>NaN</td>\n",
+              "      <td>4.56</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>0.00</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>31.29</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>1985.00</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>33.29</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>25%</th>\n",
+              "      <td>NaN</td>\n",
+              "      <td>8.77</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>0.03</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>93.83</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>1987.00</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>834.25</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>50%</th>\n",
+              "      <td>NaN</td>\n",
+              "      <td>12.60</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>0.05</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>143.01</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>1999.00</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>1794.33</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>75%</th>\n",
+              "      <td>NaN</td>\n",
+              "      <td>16.85</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>0.09</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>185.64</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>2004.00</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>3101.30</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>max</th>\n",
+              "      <td>NaN</td>\n",
+              "      <td>21.35</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>0.33</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>266.89</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>2009.00</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>13086.96</td>\n",
+              "    </tr>\n",
+              "  </tbody>\n",
+              "</table>\n",
+              "</div>\n",
+              "      <button class=\"colab-df-convert\" onclick=\"convertToInteractive('df-4b3477f4-4d58-40d4-88fa-50c7dc6b9c64')\"\n",
+              "              title=\"Convert this dataframe to an interactive table.\"\n",
+              "              style=\"display:none;\">\n",
+              "        \n",
+              "  <svg xmlns=\"http://www.w3.org/2000/svg\" height=\"24px\"viewBox=\"0 0 24 24\"\n",
+              "       width=\"24px\">\n",
+              "    <path d=\"M0 0h24v24H0V0z\" fill=\"none\"/>\n",
+              "    <path d=\"M18.56 5.44l.94 2.06.94-2.06 2.06-.94-2.06-.94-.94-2.06-.94 2.06-2.06.94zm-11 1L8.5 8.5l.94-2.06 2.06-.94-2.06-.94L8.5 2.5l-.94 2.06-2.06.94zm10 10l.94 2.06.94-2.06 2.06-.94-2.06-.94-.94-2.06-.94 2.06-2.06.94z\"/><path d=\"M17.41 7.96l-1.37-1.37c-.4-.4-.92-.59-1.43-.59-.52 0-1.04.2-1.43.59L10.3 9.45l-7.72 7.72c-.78.78-.78 2.05 0 2.83L4 21.41c.39.39.9.59 1.41.59.51 0 1.02-.2 1.41-.59l7.78-7.78 2.81-2.81c.8-.78.8-2.07 0-2.86zM5.41 20L4 18.59l7.72-7.72 1.47 1.35L5.41 20z\"/>\n",
+              "  </svg>\n",
+              "      </button>\n",
+              "      \n",
+              "  <style>\n",
+              "    .colab-df-container {\n",
+              "      display:flex;\n",
+              "      flex-wrap:wrap;\n",
+              "      gap: 12px;\n",
+              "    }\n",
+              "\n",
+              "    .colab-df-convert {\n",
+              "      background-color: #E8F0FE;\n",
+              "      border: none;\n",
+              "      border-radius: 50%;\n",
+              "      cursor: pointer;\n",
+              "      display: none;\n",
+              "      fill: #1967D2;\n",
+              "      height: 32px;\n",
+              "      padding: 0 0 0 0;\n",
+              "      width: 32px;\n",
+              "    }\n",
+              "\n",
+              "    .colab-df-convert:hover {\n",
+              "      background-color: #E2EBFA;\n",
+              "      box-shadow: 0px 1px 2px rgba(60, 64, 67, 0.3), 0px 1px 3px 1px rgba(60, 64, 67, 0.15);\n",
+              "      fill: #174EA6;\n",
+              "    }\n",
+              "\n",
+              "    [theme=dark] .colab-df-convert {\n",
+              "      background-color: #3B4455;\n",
+              "      fill: #D2E3FC;\n",
+              "    }\n",
+              "\n",
+              "    [theme=dark] .colab-df-convert:hover {\n",
+              "      background-color: #434B5C;\n",
+              "      box-shadow: 0px 1px 3px 1px rgba(0, 0, 0, 0.15);\n",
+              "      filter: drop-shadow(0px 1px 2px rgba(0, 0, 0, 0.3));\n",
+              "      fill: #FFFFFF;\n",
+              "    }\n",
+              "  </style>\n",
+              "\n",
+              "      <script>\n",
+              "        const buttonEl =\n",
+              "          document.querySelector('#df-4b3477f4-4d58-40d4-88fa-50c7dc6b9c64 button.colab-df-convert');\n",
+              "        buttonEl.style.display =\n",
+              "          google.colab.kernel.accessAllowed ? 'block' : 'none';\n",
+              "\n",
+              "        async function convertToInteractive(key) {\n",
+              "          const element = document.querySelector('#df-4b3477f4-4d58-40d4-88fa-50c7dc6b9c64');\n",
+              "          const dataTable =\n",
+              "            await google.colab.kernel.invokeFunction('convertToInteractive',\n",
+              "                                                     [key], {});\n",
+              "          if (!dataTable) return;\n",
+              "\n",
+              "          const docLinkHtml = 'Like what you see? Visit the ' +\n",
+              "            '<a target=\"_blank\" href=https://colab.research.google.com/notebooks/data_table.ipynb>data table notebook</a>'\n",
+              "            + ' to learn more about interactive tables.';\n",
+              "          element.innerHTML = '';\n",
+              "          dataTable['output_type'] = 'display_data';\n",
+              "          await google.colab.output.renderOutput(dataTable, element);\n",
+              "          const docLink = document.createElement('div');\n",
+              "          docLink.innerHTML = docLinkHtml;\n",
+              "          element.appendChild(docLink);\n",
+              "        }\n",
+              "      </script>\n",
+              "    </div>\n",
+              "  </div>\n",
+              "  "
+            ]
+          },
+          "metadata": {},
+          "execution_count": 5
+        }
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "#Identifying Duplicates"
+      ],
+      "metadata": {
+        "id": "5QSIJ6ZSKs7x"
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "data.duplicated().sum()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "km3q9RuUgZOK",
+        "outputId": "495ac08d-3ee7-489b-e0f5-d734b3717bfc"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "0"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 6
+        }
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "#Identifying and Handling Null Data"
+      ],
+      "metadata": {
+        "id": "oc-n3hIuK1Uo"
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "data.isna().sum()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "OY03oAkUefdK",
+        "outputId": "4e93e564-2266-4f83-caea-ad22e06df5ce"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "Item_Identifier                 0\n",
+              "Item_Weight                  1463\n",
+              "Item_Fat_Content                0\n",
+              "Item_Visibility                 0\n",
+              "Item_Type                       0\n",
+              "Item_MRP                        0\n",
+              "Outlet_Identifier               0\n",
+              "Outlet_Establishment_Year       0\n",
+              "Outlet_Size                  2410\n",
+              "Outlet_Location_Type            0\n",
+              "Outlet_Type                     0\n",
+              "Item_Outlet_Sales               0\n",
+              "dtype: int64"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 7
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# Checking to see if there is a pattern/correlation within missing weight values.\n",
+        "\n",
+        "missing_weight = data[data['Item_Weight'].isna()]\n",
+        "missing_weight['Item_Type'].value_counts()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "Yhg-7Qjyx8ju",
+        "outputId": "b01e1737-db05-473b-d8e4-3f54c9d9da2c"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "Fruits and Vegetables    213\n",
+              "Snack Foods              212\n",
+              "Household                151\n",
+              "Frozen Foods             138\n",
+              "Dairy                    116\n",
+              "Baking Goods             112\n",
+              "Canned                   110\n",
+              "Health and Hygiene        90\n",
+              "Meat                      88\n",
+              "Soft Drinks               71\n",
+              "Breads                    47\n",
+              "Others                    32\n",
+              "Hard Drinks               31\n",
+              "Breakfast                 21\n",
+              "Starchy Foods             18\n",
+              "Seafood                   13\n",
+              "Name: Item_Type, dtype: int64"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 9
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "missing_weight['Outlet_Location_Type'].value_counts()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "aJ2iGK_c6RGm",
+        "outputId": "3edbcb57-5abf-4d0a-9a46-98316808911f"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "Tier 3    935\n",
+              "Tier 1    528\n",
+              "Name: Outlet_Location_Type, dtype: int64"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 10
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "missing_weight['Outlet_Establishment_Year'].value_counts()\n",
+        "\n",
+        "# It seems like all missing weight data comes from 1985"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "fGVpid4L6a3e",
+        "outputId": "a20f6fb7-da7c-429d-d41c-98d164dde152"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "1985    1463\n",
+              "Name: Outlet_Establishment_Year, dtype: int64"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 11
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# Checking to see if there is a pattern/correlation between missing outlet size values.\n",
+        "\n",
+        "missing_outlet_size = data[data['Outlet_Size'].isna()]\n",
+        "missing_outlet_size['Outlet_Type'].value_counts()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "-LOBsMgK2Fo_",
+        "outputId": "a115fe29-8b42-4d4a-d7ed-878abb45ab28"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "Supermarket Type1    1855\n",
+              "Grocery Store         555\n",
+              "Name: Outlet_Type, dtype: int64"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 12
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "data['Outlet_Size'].value_counts()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "7P5T1BgsV5gq",
+        "outputId": "77345fa7-76c8-484b-fbd2-02ce20a55e7a"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "Medium    2793\n",
+              "Small     2388\n",
+              "High       932\n",
+              "Name: Outlet_Size, dtype: int64"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 8
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "data[['Outlet_Size', 'Outlet_Type', 'Outlet_Location_Type']].value_counts()\n",
+        "\n",
+        "# Looks like all missing Grocery Store sizes are Tier 3, and missing Supermarket Type 1 are Tier 2."
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "ED9bcBQiXB3_",
+        "outputId": "d2b63370-df6c-42e4-fe56-62b86e67bd48"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "Outlet_Size  Outlet_Type        Outlet_Location_Type\n",
+              "Missing      Supermarket Type1  Tier 2                  1855\n",
+              "Medium       Supermarket Type3  Tier 3                   935\n",
+              "High         Supermarket Type1  Tier 3                   932\n",
+              "Medium       Supermarket Type1  Tier 1                   930\n",
+              "Small        Supermarket Type1  Tier 1                   930\n",
+              "                                Tier 2                   930\n",
+              "Medium       Supermarket Type2  Tier 3                   928\n",
+              "Missing      Grocery Store      Tier 3                   555\n",
+              "Small        Grocery Store      Tier 1                   528\n",
+              "dtype: int64"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 39
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "grocery_filter = data['Outlet_Type'] == 'Grocery Store'\n",
+        "data[grocery_filter][['Outlet_Type', 'Outlet_Size']].head()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 206
+        },
+        "id": "2qCkan4CYSKz",
+        "outputId": "f2abf11b-4f91-462d-f156-b8cefb7dc5f5"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "      Outlet_Type Outlet_Size\n",
+              "3   Grocery Store     Missing\n",
+              "23  Grocery Store       Small\n",
+              "28  Grocery Store     Missing\n",
+              "29  Grocery Store       Small\n",
+              "30  Grocery Store     Missing"
+            ],
+            "text/html": [
+              "\n",
+              "  <div id=\"df-102728df-89f5-44b2-bc37-e1da5758c1a4\">\n",
+              "    <div class=\"colab-df-container\">\n",
+              "      <div>\n",
+              "<style scoped>\n",
+              "    .dataframe tbody tr th:only-of-type {\n",
+              "        vertical-align: middle;\n",
+              "    }\n",
+              "\n",
+              "    .dataframe tbody tr th {\n",
+              "        vertical-align: top;\n",
+              "    }\n",
+              "\n",
+              "    .dataframe thead th {\n",
+              "        text-align: right;\n",
+              "    }\n",
+              "</style>\n",
+              "<table border=\"1\" class=\"dataframe\">\n",
+              "  <thead>\n",
+              "    <tr style=\"text-align: right;\">\n",
+              "      <th></th>\n",
+              "      <th>Outlet_Type</th>\n",
+              "      <th>Outlet_Size</th>\n",
+              "    </tr>\n",
+              "  </thead>\n",
+              "  <tbody>\n",
+              "    <tr>\n",
+              "      <th>3</th>\n",
+              "      <td>Grocery Store</td>\n",
+              "      <td>Missing</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>23</th>\n",
+              "      <td>Grocery Store</td>\n",
+              "      <td>Small</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>28</th>\n",
+              "      <td>Grocery Store</td>\n",
+              "      <td>Missing</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>29</th>\n",
+              "      <td>Grocery Store</td>\n",
+              "      <td>Small</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>30</th>\n",
+              "      <td>Grocery Store</td>\n",
+              "      <td>Missing</td>\n",
+              "    </tr>\n",
+              "  </tbody>\n",
+              "</table>\n",
+              "</div>\n",
+              "      <button class=\"colab-df-convert\" onclick=\"convertToInteractive('df-102728df-89f5-44b2-bc37-e1da5758c1a4')\"\n",
+              "              title=\"Convert this dataframe to an interactive table.\"\n",
+              "              style=\"display:none;\">\n",
+              "        \n",
+              "  <svg xmlns=\"http://www.w3.org/2000/svg\" height=\"24px\"viewBox=\"0 0 24 24\"\n",
+              "       width=\"24px\">\n",
+              "    <path d=\"M0 0h24v24H0V0z\" fill=\"none\"/>\n",
+              "    <path d=\"M18.56 5.44l.94 2.06.94-2.06 2.06-.94-2.06-.94-.94-2.06-.94 2.06-2.06.94zm-11 1L8.5 8.5l.94-2.06 2.06-.94-2.06-.94L8.5 2.5l-.94 2.06-2.06.94zm10 10l.94 2.06.94-2.06 2.06-.94-2.06-.94-.94-2.06-.94 2.06-2.06.94z\"/><path d=\"M17.41 7.96l-1.37-1.37c-.4-.4-.92-.59-1.43-.59-.52 0-1.04.2-1.43.59L10.3 9.45l-7.72 7.72c-.78.78-.78 2.05 0 2.83L4 21.41c.39.39.9.59 1.41.59.51 0 1.02-.2 1.41-.59l7.78-7.78 2.81-2.81c.8-.78.8-2.07 0-2.86zM5.41 20L4 18.59l7.72-7.72 1.47 1.35L5.41 20z\"/>\n",
+              "  </svg>\n",
+              "      </button>\n",
+              "      \n",
+              "  <style>\n",
+              "    .colab-df-container {\n",
+              "      display:flex;\n",
+              "      flex-wrap:wrap;\n",
+              "      gap: 12px;\n",
+              "    }\n",
+              "\n",
+              "    .colab-df-convert {\n",
+              "      background-color: #E8F0FE;\n",
+              "      border: none;\n",
+              "      border-radius: 50%;\n",
+              "      cursor: pointer;\n",
+              "      display: none;\n",
+              "      fill: #1967D2;\n",
+              "      height: 32px;\n",
+              "      padding: 0 0 0 0;\n",
+              "      width: 32px;\n",
+              "    }\n",
+              "\n",
+              "    .colab-df-convert:hover {\n",
+              "      background-color: #E2EBFA;\n",
+              "      box-shadow: 0px 1px 2px rgba(60, 64, 67, 0.3), 0px 1px 3px 1px rgba(60, 64, 67, 0.15);\n",
+              "      fill: #174EA6;\n",
+              "    }\n",
+              "\n",
+              "    [theme=dark] .colab-df-convert {\n",
+              "      background-color: #3B4455;\n",
+              "      fill: #D2E3FC;\n",
+              "    }\n",
+              "\n",
+              "    [theme=dark] .colab-df-convert:hover {\n",
+              "      background-color: #434B5C;\n",
+              "      box-shadow: 0px 1px 3px 1px rgba(0, 0, 0, 0.15);\n",
+              "      filter: drop-shadow(0px 1px 2px rgba(0, 0, 0, 0.3));\n",
+              "      fill: #FFFFFF;\n",
+              "    }\n",
+              "  </style>\n",
+              "\n",
+              "      <script>\n",
+              "        const buttonEl =\n",
+              "          document.querySelector('#df-102728df-89f5-44b2-bc37-e1da5758c1a4 button.colab-df-convert');\n",
+              "        buttonEl.style.display =\n",
+              "          google.colab.kernel.accessAllowed ? 'block' : 'none';\n",
+              "\n",
+              "        async function convertToInteractive(key) {\n",
+              "          const element = document.querySelector('#df-102728df-89f5-44b2-bc37-e1da5758c1a4');\n",
+              "          const dataTable =\n",
+              "            await google.colab.kernel.invokeFunction('convertToInteractive',\n",
+              "                                                     [key], {});\n",
+              "          if (!dataTable) return;\n",
+              "\n",
+              "          const docLinkHtml = 'Like what you see? Visit the ' +\n",
+              "            '<a target=\"_blank\" href=https://colab.research.google.com/notebooks/data_table.ipynb>data table notebook</a>'\n",
+              "            + ' to learn more about interactive tables.';\n",
+              "          element.innerHTML = '';\n",
+              "          dataTable['output_type'] = 'display_data';\n",
+              "          await google.colab.output.renderOutput(dataTable, element);\n",
+              "          const docLink = document.createElement('div');\n",
+              "          docLink.innerHTML = docLinkHtml;\n",
+              "          element.appendChild(docLink);\n",
+              "        }\n",
+              "      </script>\n",
+              "    </div>\n",
+              "  </div>\n",
+              "  "
+            ]
+          },
+          "metadata": {},
+          "execution_count": 35
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "missing_outlet_size['Outlet_Establishment_Year'].value_counts()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "POR81YxG8I9h",
+        "outputId": "dd0c1365-eebb-4be0-a51d-71bd854e81b5"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "2002    929\n",
+              "2007    926\n",
+              "1998    555\n",
+              "Name: Outlet_Establishment_Year, dtype: int64"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 13
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "missing_outlet_size['Outlet_Location_Type'].value_counts()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "ZdxbkO4U8R-Y",
+        "outputId": "16a7fe1b-3902-4db3-dea1-4c974de8756e"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "Tier 2    1855\n",
+              "Tier 3     555\n",
+              "Name: Outlet_Location_Type, dtype: int64"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 14
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "missing_outlet_size['Outlet_Identifier'].value_counts()\n",
+        "\n",
+        "# There doesn't seem to be a clear pattern in missing size data."
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "xw_uUNH18cLh",
+        "outputId": "77f54473-c290-4be0-f875-a04c805ca023"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "OUT045    929\n",
+              "OUT017    926\n",
+              "OUT010    555\n",
+              "Name: Outlet_Identifier, dtype: int64"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 15
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# There are a large amount of missing values.\n",
+        "# I will replace missing weight data with average weight.\n",
+        "\n",
+        "avg_weight = data['Item_Weight'].mean().round(4)\n",
+        "avg_weight"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "o_X6NKAG98WK",
+        "outputId": "0138567d-3ea0-44c3-c82f-88ed7acff386"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "12.8576"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 16
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "data['Item_Weight'].fillna(avg_weight, inplace = True)\n",
+        "data['Outlet_Size'].fillna('Missing', inplace = True)\n",
+        "data.isna().sum()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "sjqszJNg4oqI",
+        "outputId": "c559b985-b817-4fc9-bb45-53d103ea65dd"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "Item_Identifier              0\n",
+              "Item_Weight                  0\n",
+              "Item_Fat_Content             0\n",
+              "Item_Visibility              0\n",
+              "Item_Type                    0\n",
+              "Item_MRP                     0\n",
+              "Outlet_Identifier            0\n",
+              "Outlet_Establishment_Year    0\n",
+              "Outlet_Size                  0\n",
+              "Outlet_Location_Type         0\n",
+              "Outlet_Type                  0\n",
+              "Item_Outlet_Sales            0\n",
+              "dtype: int64"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 17
+        }
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "#Identifying and Fixing Inconsistent Data"
+      ],
+      "metadata": {
+        "id": "8FLsn5E6K_RU"
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "data.value_counts()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "GPKjQwo0EZFZ",
+        "outputId": "098a42b2-febb-4079-9482-0d63cd6dfa96"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "Item_Identifier  Item_Weight  Item_Fat_Content  Item_Visibility  Item_Type              Item_MRP  Outlet_Identifier  Outlet_Establishment_Year  Outlet_Size  Outlet_Location_Type  Outlet_Type        Item_Outlet_Sales\n",
+              "DRA12            11.6000      LF                0.000000         Soft Drinks            141.9154  OUT035             2004                       Small        Tier 2                Supermarket Type1  992.7078             1\n",
+              "FDV28            12.8576      Regular           0.158955         Frozen Foods           34.9558   OUT027             1985                       Medium       Tier 3                Supermarket Type3  1120.5414            1\n",
+              "FDV32            7.7850       Low Fat           0.089210         Fruits and Vegetables  64.2510   OUT017             2007                       Missing      Tier 2                Supermarket Type1  1328.2710            1\n",
+              "                                                0.089070         Fruits and Vegetables  62.7510   OUT018             2009                       Medium       Tier 3                Supermarket Type2  1707.7770            1\n",
+              "                                                0.088846         Fruits and Vegetables  61.4510   OUT049             1999                       Medium       Tier 1                Supermarket Type1  759.0120             1\n",
+              "                                                                                                                                                                                                                          ..\n",
+              "FDJ22            18.7500      Low Fat           0.053109         Snack Foods            193.6504  OUT017             2007                       Missing      Tier 2                Supermarket Type1  2876.2560            1\n",
+              "                                                0.053025         Snack Foods            192.5504  OUT018             2009                       Medium       Tier 3                Supermarket Type2  2109.2544            1\n",
+              "                                                0.052917         Snack Foods            190.6504  OUT045             2002                       Missing      Tier 2                Supermarket Type1  1342.2528            1\n",
+              "                                                0.052800         Snack Foods            193.2504  OUT035             2004                       Small        Tier 2                Supermarket Type1  2684.5056            1\n",
+              "NCZ54            14.6500      Low Fat           0.083699         Household              163.4552  OUT018             2009                       Medium       Tier 3                Supermarket Type2  2599.2832            1\n",
+              "Length: 8523, dtype: int64"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 18
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "data.describe(include = \"all\")"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 476
+        },
+        "id": "w6X0XaZxLHjL",
+        "outputId": "1309c7d5-3715-4fdd-9134-45050c0ff93f"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "       Item_Identifier  Item_Weight Item_Fat_Content  Item_Visibility  \\\n",
+              "count             8523  8523.000000             8523      8523.000000   \n",
+              "unique            1559          NaN                5              NaN   \n",
+              "top              FDW13          NaN          Low Fat              NaN   \n",
+              "freq                10          NaN             5089              NaN   \n",
+              "mean               NaN    12.857637              NaN         0.066132   \n",
+              "std                NaN     4.226124              NaN         0.051598   \n",
+              "min                NaN     4.555000              NaN         0.000000   \n",
+              "25%                NaN     9.310000              NaN         0.026989   \n",
+              "50%                NaN    12.857600              NaN         0.053931   \n",
+              "75%                NaN    16.000000              NaN         0.094585   \n",
+              "max                NaN    21.350000              NaN         0.328391   \n",
+              "\n",
+              "                    Item_Type     Item_MRP Outlet_Identifier  \\\n",
+              "count                    8523  8523.000000              8523   \n",
+              "unique                     16          NaN                10   \n",
+              "top     Fruits and Vegetables          NaN            OUT027   \n",
+              "freq                     1232          NaN               935   \n",
+              "mean                      NaN   140.992782               NaN   \n",
+              "std                       NaN    62.275067               NaN   \n",
+              "min                       NaN    31.290000               NaN   \n",
+              "25%                       NaN    93.826500               NaN   \n",
+              "50%                       NaN   143.012800               NaN   \n",
+              "75%                       NaN   185.643700               NaN   \n",
+              "max                       NaN   266.888400               NaN   \n",
+              "\n",
+              "        Outlet_Establishment_Year Outlet_Size Outlet_Location_Type  \\\n",
+              "count                 8523.000000        8523                 8523   \n",
+              "unique                        NaN           4                    3   \n",
+              "top                           NaN      Medium               Tier 3   \n",
+              "freq                          NaN        2793                 3350   \n",
+              "mean                  1997.831867         NaN                  NaN   \n",
+              "std                      8.371760         NaN                  NaN   \n",
+              "min                   1985.000000         NaN                  NaN   \n",
+              "25%                   1987.000000         NaN                  NaN   \n",
+              "50%                   1999.000000         NaN                  NaN   \n",
+              "75%                   2004.000000         NaN                  NaN   \n",
+              "max                   2009.000000         NaN                  NaN   \n",
+              "\n",
+              "              Outlet_Type  Item_Outlet_Sales  \n",
+              "count                8523        8523.000000  \n",
+              "unique                  4                NaN  \n",
+              "top     Supermarket Type1                NaN  \n",
+              "freq                 5577                NaN  \n",
+              "mean                  NaN        2181.288914  \n",
+              "std                   NaN        1706.499616  \n",
+              "min                   NaN          33.290000  \n",
+              "25%                   NaN         834.247400  \n",
+              "50%                   NaN        1794.331000  \n",
+              "75%                   NaN        3101.296400  \n",
+              "max                   NaN       13086.964800  "
+            ],
+            "text/html": [
+              "\n",
+              "  <div id=\"df-9d0a0efe-51e4-466a-b239-9a241252682f\">\n",
+              "    <div class=\"colab-df-container\">\n",
+              "      <div>\n",
+              "<style scoped>\n",
+              "    .dataframe tbody tr th:only-of-type {\n",
+              "        vertical-align: middle;\n",
+              "    }\n",
+              "\n",
+              "    .dataframe tbody tr th {\n",
+              "        vertical-align: top;\n",
+              "    }\n",
+              "\n",
+              "    .dataframe thead th {\n",
+              "        text-align: right;\n",
+              "    }\n",
+              "</style>\n",
+              "<table border=\"1\" class=\"dataframe\">\n",
+              "  <thead>\n",
+              "    <tr style=\"text-align: right;\">\n",
+              "      <th></th>\n",
+              "      <th>Item_Identifier</th>\n",
+              "      <th>Item_Weight</th>\n",
+              "      <th>Item_Fat_Content</th>\n",
+              "      <th>Item_Visibility</th>\n",
+              "      <th>Item_Type</th>\n",
+              "      <th>Item_MRP</th>\n",
+              "      <th>Outlet_Identifier</th>\n",
+              "      <th>Outlet_Establishment_Year</th>\n",
+              "      <th>Outlet_Size</th>\n",
+              "      <th>Outlet_Location_Type</th>\n",
+              "      <th>Outlet_Type</th>\n",
+              "      <th>Item_Outlet_Sales</th>\n",
+              "    </tr>\n",
+              "  </thead>\n",
+              "  <tbody>\n",
+              "    <tr>\n",
+              "      <th>count</th>\n",
+              "      <td>8523</td>\n",
+              "      <td>8523.000000</td>\n",
+              "      <td>8523</td>\n",
+              "      <td>8523.000000</td>\n",
+              "      <td>8523</td>\n",
+              "      <td>8523.000000</td>\n",
+              "      <td>8523</td>\n",
+              "      <td>8523.000000</td>\n",
+              "      <td>8523</td>\n",
+              "      <td>8523</td>\n",
+              "      <td>8523</td>\n",
+              "      <td>8523.000000</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>unique</th>\n",
+              "      <td>1559</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>5</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>16</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>10</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>4</td>\n",
+              "      <td>3</td>\n",
+              "      <td>4</td>\n",
+              "      <td>NaN</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>top</th>\n",
+              "      <td>FDW13</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>Low Fat</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>Fruits and Vegetables</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>OUT027</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>Medium</td>\n",
+              "      <td>Tier 3</td>\n",
+              "      <td>Supermarket Type1</td>\n",
+              "      <td>NaN</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>freq</th>\n",
+              "      <td>10</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>5089</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>1232</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>935</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>2793</td>\n",
+              "      <td>3350</td>\n",
+              "      <td>5577</td>\n",
+              "      <td>NaN</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>mean</th>\n",
+              "      <td>NaN</td>\n",
+              "      <td>12.857637</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>0.066132</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>140.992782</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>1997.831867</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>2181.288914</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>std</th>\n",
+              "      <td>NaN</td>\n",
+              "      <td>4.226124</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>0.051598</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>62.275067</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>8.371760</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>1706.499616</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>min</th>\n",
+              "      <td>NaN</td>\n",
+              "      <td>4.555000</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>0.000000</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>31.290000</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>1985.000000</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>33.290000</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>25%</th>\n",
+              "      <td>NaN</td>\n",
+              "      <td>9.310000</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>0.026989</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>93.826500</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>1987.000000</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>834.247400</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>50%</th>\n",
+              "      <td>NaN</td>\n",
+              "      <td>12.857600</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>0.053931</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>143.012800</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>1999.000000</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>1794.331000</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>75%</th>\n",
+              "      <td>NaN</td>\n",
+              "      <td>16.000000</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>0.094585</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>185.643700</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>2004.000000</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>3101.296400</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>max</th>\n",
+              "      <td>NaN</td>\n",
+              "      <td>21.350000</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>0.328391</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>266.888400</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>2009.000000</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>13086.964800</td>\n",
+              "    </tr>\n",
+              "  </tbody>\n",
+              "</table>\n",
+              "</div>\n",
+              "      <button class=\"colab-df-convert\" onclick=\"convertToInteractive('df-9d0a0efe-51e4-466a-b239-9a241252682f')\"\n",
+              "              title=\"Convert this dataframe to an interactive table.\"\n",
+              "              style=\"display:none;\">\n",
+              "        \n",
+              "  <svg xmlns=\"http://www.w3.org/2000/svg\" height=\"24px\"viewBox=\"0 0 24 24\"\n",
+              "       width=\"24px\">\n",
+              "    <path d=\"M0 0h24v24H0V0z\" fill=\"none\"/>\n",
+              "    <path d=\"M18.56 5.44l.94 2.06.94-2.06 2.06-.94-2.06-.94-.94-2.06-.94 2.06-2.06.94zm-11 1L8.5 8.5l.94-2.06 2.06-.94-2.06-.94L8.5 2.5l-.94 2.06-2.06.94zm10 10l.94 2.06.94-2.06 2.06-.94-2.06-.94-.94-2.06-.94 2.06-2.06.94z\"/><path d=\"M17.41 7.96l-1.37-1.37c-.4-.4-.92-.59-1.43-.59-.52 0-1.04.2-1.43.59L10.3 9.45l-7.72 7.72c-.78.78-.78 2.05 0 2.83L4 21.41c.39.39.9.59 1.41.59.51 0 1.02-.2 1.41-.59l7.78-7.78 2.81-2.81c.8-.78.8-2.07 0-2.86zM5.41 20L4 18.59l7.72-7.72 1.47 1.35L5.41 20z\"/>\n",
+              "  </svg>\n",
+              "      </button>\n",
+              "      \n",
+              "  <style>\n",
+              "    .colab-df-container {\n",
+              "      display:flex;\n",
+              "      flex-wrap:wrap;\n",
+              "      gap: 12px;\n",
+              "    }\n",
+              "\n",
+              "    .colab-df-convert {\n",
+              "      background-color: #E8F0FE;\n",
+              "      border: none;\n",
+              "      border-radius: 50%;\n",
+              "      cursor: pointer;\n",
+              "      display: none;\n",
+              "      fill: #1967D2;\n",
+              "      height: 32px;\n",
+              "      padding: 0 0 0 0;\n",
+              "      width: 32px;\n",
+              "    }\n",
+              "\n",
+              "    .colab-df-convert:hover {\n",
+              "      background-color: #E2EBFA;\n",
+              "      box-shadow: 0px 1px 2px rgba(60, 64, 67, 0.3), 0px 1px 3px 1px rgba(60, 64, 67, 0.15);\n",
+              "      fill: #174EA6;\n",
+              "    }\n",
+              "\n",
+              "    [theme=dark] .colab-df-convert {\n",
+              "      background-color: #3B4455;\n",
+              "      fill: #D2E3FC;\n",
+              "    }\n",
+              "\n",
+              "    [theme=dark] .colab-df-convert:hover {\n",
+              "      background-color: #434B5C;\n",
+              "      box-shadow: 0px 1px 3px 1px rgba(0, 0, 0, 0.15);\n",
+              "      filter: drop-shadow(0px 1px 2px rgba(0, 0, 0, 0.3));\n",
+              "      fill: #FFFFFF;\n",
+              "    }\n",
+              "  </style>\n",
+              "\n",
+              "      <script>\n",
+              "        const buttonEl =\n",
+              "          document.querySelector('#df-9d0a0efe-51e4-466a-b239-9a241252682f button.colab-df-convert');\n",
+              "        buttonEl.style.display =\n",
+              "          google.colab.kernel.accessAllowed ? 'block' : 'none';\n",
+              "\n",
+              "        async function convertToInteractive(key) {\n",
+              "          const element = document.querySelector('#df-9d0a0efe-51e4-466a-b239-9a241252682f');\n",
+              "          const dataTable =\n",
+              "            await google.colab.kernel.invokeFunction('convertToInteractive',\n",
+              "                                                     [key], {});\n",
+              "          if (!dataTable) return;\n",
+              "\n",
+              "          const docLinkHtml = 'Like what you see? Visit the ' +\n",
+              "            '<a target=\"_blank\" href=https://colab.research.google.com/notebooks/data_table.ipynb>data table notebook</a>'\n",
+              "            + ' to learn more about interactive tables.';\n",
+              "          element.innerHTML = '';\n",
+              "          dataTable['output_type'] = 'display_data';\n",
+              "          await google.colab.output.renderOutput(dataTable, element);\n",
+              "          const docLink = document.createElement('div');\n",
+              "          docLink.innerHTML = docLinkHtml;\n",
+              "          element.appendChild(docLink);\n",
+              "        }\n",
+              "      </script>\n",
+              "    </div>\n",
+              "  </div>\n",
+              "  "
+            ]
+          },
+          "metadata": {},
+          "execution_count": 19
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "data['Item_Fat_Content'].value_counts()\n",
+        "\n",
+        "# Looks like there is inconsistent data here."
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "Dueh4CYoLToS",
+        "outputId": "9737dda0-a157-49b1-96ee-174d1af045fd"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "Low Fat    5089\n",
+              "Regular    2889\n",
+              "LF          316\n",
+              "reg         117\n",
+              "low fat     112\n",
+              "Name: Item_Fat_Content, dtype: int64"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 20
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "data.replace(['LF', 'low fat', 'reg'], ['Low Fat', 'Low Fat', 'Regular'], inplace = True)\n",
+        "data['Item_Fat_Content'].value_counts()\n",
+        "\n",
+        "# I have replaced all inconsistencies."
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "K_jb7lQaLZ7C",
+        "outputId": "128ee644-7e02-4baf-d66b-4d6337dbe337"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "Low Fat    5517\n",
+              "Regular    3006\n",
+              "Name: Item_Fat_Content, dtype: int64"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 21
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "data['Item_Type'].value_counts()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "pK8GI0lIN3u8",
+        "outputId": "8e8296b8-0e44-44df-910f-21687e21d193"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "Fruits and Vegetables    1232\n",
+              "Snack Foods              1200\n",
+              "Household                 910\n",
+              "Frozen Foods              856\n",
+              "Dairy                     682\n",
+              "Canned                    649\n",
+              "Baking Goods              648\n",
+              "Health and Hygiene        520\n",
+              "Soft Drinks               445\n",
+              "Meat                      425\n",
+              "Breads                    251\n",
+              "Hard Drinks               214\n",
+              "Others                    169\n",
+              "Starchy Foods             148\n",
+              "Breakfast                 110\n",
+              "Seafood                    64\n",
+              "Name: Item_Type, dtype: int64"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 22
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "data['Outlet_Identifier'].value_counts()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "EqN1Mk93PmUm",
+        "outputId": "e855f25a-7f43-4a07-f2ba-d67bacef4238"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "OUT027    935\n",
+              "OUT013    932\n",
+              "OUT049    930\n",
+              "OUT046    930\n",
+              "OUT035    930\n",
+              "OUT045    929\n",
+              "OUT018    928\n",
+              "OUT017    926\n",
+              "OUT010    555\n",
+              "OUT019    528\n",
+              "Name: Outlet_Identifier, dtype: int64"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 23
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "data['Outlet_Size'].value_counts()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "Xkzr5eTKPwTf",
+        "outputId": "41ce4aa5-7d70-46ea-d541-0ce56c3a3760"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "Medium     2793\n",
+              "Missing    2410\n",
+              "Small      2388\n",
+              "High        932\n",
+              "Name: Outlet_Size, dtype: int64"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 24
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "data['Outlet_Type'].value_counts()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "ECkYrxawQKAo",
+        "outputId": "21151fe8-1a5d-402e-b882-221acc4b93f7"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "Supermarket Type1    5577\n",
+              "Grocery Store        1083\n",
+              "Supermarket Type3     935\n",
+              "Supermarket Type2     928\n",
+              "Name: Outlet_Type, dtype: int64"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 25
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "data['Outlet_Location_Type'].value_counts()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "olWXZBhwQ3_7",
+        "outputId": "9d1b3557-3ce5-44c1-f2d3-8603621d22a9"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "Tier 3    3350\n",
+              "Tier 2    2785\n",
+              "Tier 1    2388\n",
+              "Name: Outlet_Location_Type, dtype: int64"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 26
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "data['Outlet_Establishment_Year'].value_counts()\n",
+        "\n",
+        "# No other inconsistencies found."
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "TuaIohPzQ_jz",
+        "outputId": "9ebf6b41-b5ec-4c8d-f6d2-42a06da545b0"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "1985    1463\n",
+              "1987     932\n",
+              "1999     930\n",
+              "1997     930\n",
+              "2004     930\n",
+              "2002     929\n",
+              "2009     928\n",
+              "2007     926\n",
+              "1998     555\n",
+              "Name: Outlet_Establishment_Year, dtype: int64"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 27
+        }
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "#Data should now be clean and consistent!"
+      ],
+      "metadata": {
+        "id": "mLUv0l_paW5u"
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "data.describe(include=\"all\").round(3)"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 476
+        },
+        "id": "k93d3xTKatJw",
+        "outputId": "9236c8b9-dcb5-4364-88a1-780666a2dfcb"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "       Item_Identifier  Item_Weight Item_Fat_Content  Item_Visibility  \\\n",
+              "count             8523     8523.000             8523         8523.000   \n",
+              "unique            1559          NaN                2              NaN   \n",
+              "top              FDW13          NaN          Low Fat              NaN   \n",
+              "freq                10          NaN             5517              NaN   \n",
+              "mean               NaN       12.858              NaN            0.066   \n",
+              "std                NaN        4.226              NaN            0.052   \n",
+              "min                NaN        4.555              NaN            0.000   \n",
+              "25%                NaN        9.310              NaN            0.027   \n",
+              "50%                NaN       12.858              NaN            0.054   \n",
+              "75%                NaN       16.000              NaN            0.095   \n",
+              "max                NaN       21.350              NaN            0.328   \n",
+              "\n",
+              "                    Item_Type  Item_MRP Outlet_Identifier  \\\n",
+              "count                    8523  8523.000              8523   \n",
+              "unique                     16       NaN                10   \n",
+              "top     Fruits and Vegetables       NaN            OUT027   \n",
+              "freq                     1232       NaN               935   \n",
+              "mean                      NaN   140.993               NaN   \n",
+              "std                       NaN    62.275               NaN   \n",
+              "min                       NaN    31.290               NaN   \n",
+              "25%                       NaN    93.826               NaN   \n",
+              "50%                       NaN   143.013               NaN   \n",
+              "75%                       NaN   185.644               NaN   \n",
+              "max                       NaN   266.888               NaN   \n",
+              "\n",
+              "        Outlet_Establishment_Year Outlet_Size Outlet_Location_Type  \\\n",
+              "count                    8523.000        8523                 8523   \n",
+              "unique                        NaN           4                    3   \n",
+              "top                           NaN      Medium               Tier 3   \n",
+              "freq                          NaN        2793                 3350   \n",
+              "mean                     1997.832         NaN                  NaN   \n",
+              "std                         8.372         NaN                  NaN   \n",
+              "min                      1985.000         NaN                  NaN   \n",
+              "25%                      1987.000         NaN                  NaN   \n",
+              "50%                      1999.000         NaN                  NaN   \n",
+              "75%                      2004.000         NaN                  NaN   \n",
+              "max                      2009.000         NaN                  NaN   \n",
+              "\n",
+              "              Outlet_Type  Item_Outlet_Sales  \n",
+              "count                8523           8523.000  \n",
+              "unique                  4                NaN  \n",
+              "top     Supermarket Type1                NaN  \n",
+              "freq                 5577                NaN  \n",
+              "mean                  NaN           2181.289  \n",
+              "std                   NaN           1706.500  \n",
+              "min                   NaN             33.290  \n",
+              "25%                   NaN            834.247  \n",
+              "50%                   NaN           1794.331  \n",
+              "75%                   NaN           3101.296  \n",
+              "max                   NaN          13086.965  "
+            ],
+            "text/html": [
+              "\n",
+              "  <div id=\"df-935a6d64-7007-4e70-9dee-9a7981615c70\">\n",
+              "    <div class=\"colab-df-container\">\n",
+              "      <div>\n",
+              "<style scoped>\n",
+              "    .dataframe tbody tr th:only-of-type {\n",
+              "        vertical-align: middle;\n",
+              "    }\n",
+              "\n",
+              "    .dataframe tbody tr th {\n",
+              "        vertical-align: top;\n",
+              "    }\n",
+              "\n",
+              "    .dataframe thead th {\n",
+              "        text-align: right;\n",
+              "    }\n",
+              "</style>\n",
+              "<table border=\"1\" class=\"dataframe\">\n",
+              "  <thead>\n",
+              "    <tr style=\"text-align: right;\">\n",
+              "      <th></th>\n",
+              "      <th>Item_Identifier</th>\n",
+              "      <th>Item_Weight</th>\n",
+              "      <th>Item_Fat_Content</th>\n",
+              "      <th>Item_Visibility</th>\n",
+              "      <th>Item_Type</th>\n",
+              "      <th>Item_MRP</th>\n",
+              "      <th>Outlet_Identifier</th>\n",
+              "      <th>Outlet_Establishment_Year</th>\n",
+              "      <th>Outlet_Size</th>\n",
+              "      <th>Outlet_Location_Type</th>\n",
+              "      <th>Outlet_Type</th>\n",
+              "      <th>Item_Outlet_Sales</th>\n",
+              "    </tr>\n",
+              "  </thead>\n",
+              "  <tbody>\n",
+              "    <tr>\n",
+              "      <th>count</th>\n",
+              "      <td>8523</td>\n",
+              "      <td>8523.000</td>\n",
+              "      <td>8523</td>\n",
+              "      <td>8523.000</td>\n",
+              "      <td>8523</td>\n",
+              "      <td>8523.000</td>\n",
+              "      <td>8523</td>\n",
+              "      <td>8523.000</td>\n",
+              "      <td>8523</td>\n",
+              "      <td>8523</td>\n",
+              "      <td>8523</td>\n",
+              "      <td>8523.000</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>unique</th>\n",
+              "      <td>1559</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>2</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>16</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>10</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>4</td>\n",
+              "      <td>3</td>\n",
+              "      <td>4</td>\n",
+              "      <td>NaN</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>top</th>\n",
+              "      <td>FDW13</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>Low Fat</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>Fruits and Vegetables</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>OUT027</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>Medium</td>\n",
+              "      <td>Tier 3</td>\n",
+              "      <td>Supermarket Type1</td>\n",
+              "      <td>NaN</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>freq</th>\n",
+              "      <td>10</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>5517</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>1232</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>935</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>2793</td>\n",
+              "      <td>3350</td>\n",
+              "      <td>5577</td>\n",
+              "      <td>NaN</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>mean</th>\n",
+              "      <td>NaN</td>\n",
+              "      <td>12.858</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>0.066</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>140.993</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>1997.832</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>2181.289</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>std</th>\n",
+              "      <td>NaN</td>\n",
+              "      <td>4.226</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>0.052</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>62.275</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>8.372</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>1706.500</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>min</th>\n",
+              "      <td>NaN</td>\n",
+              "      <td>4.555</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>0.000</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>31.290</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>1985.000</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>33.290</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>25%</th>\n",
+              "      <td>NaN</td>\n",
+              "      <td>9.310</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>0.027</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>93.826</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>1987.000</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>834.247</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>50%</th>\n",
+              "      <td>NaN</td>\n",
+              "      <td>12.858</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>0.054</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>143.013</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>1999.000</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>1794.331</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>75%</th>\n",
+              "      <td>NaN</td>\n",
+              "      <td>16.000</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>0.095</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>185.644</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>2004.000</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>3101.296</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>max</th>\n",
+              "      <td>NaN</td>\n",
+              "      <td>21.350</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>0.328</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>266.888</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>2009.000</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>NaN</td>\n",
+              "      <td>13086.965</td>\n",
+              "    </tr>\n",
+              "  </tbody>\n",
+              "</table>\n",
+              "</div>\n",
+              "      <button class=\"colab-df-convert\" onclick=\"convertToInteractive('df-935a6d64-7007-4e70-9dee-9a7981615c70')\"\n",
+              "              title=\"Convert this dataframe to an interactive table.\"\n",
+              "              style=\"display:none;\">\n",
+              "        \n",
+              "  <svg xmlns=\"http://www.w3.org/2000/svg\" height=\"24px\"viewBox=\"0 0 24 24\"\n",
+              "       width=\"24px\">\n",
+              "    <path d=\"M0 0h24v24H0V0z\" fill=\"none\"/>\n",
+              "    <path d=\"M18.56 5.44l.94 2.06.94-2.06 2.06-.94-2.06-.94-.94-2.06-.94 2.06-2.06.94zm-11 1L8.5 8.5l.94-2.06 2.06-.94-2.06-.94L8.5 2.5l-.94 2.06-2.06.94zm10 10l.94 2.06.94-2.06 2.06-.94-2.06-.94-.94-2.06-.94 2.06-2.06.94z\"/><path d=\"M17.41 7.96l-1.37-1.37c-.4-.4-.92-.59-1.43-.59-.52 0-1.04.2-1.43.59L10.3 9.45l-7.72 7.72c-.78.78-.78 2.05 0 2.83L4 21.41c.39.39.9.59 1.41.59.51 0 1.02-.2 1.41-.59l7.78-7.78 2.81-2.81c.8-.78.8-2.07 0-2.86zM5.41 20L4 18.59l7.72-7.72 1.47 1.35L5.41 20z\"/>\n",
+              "  </svg>\n",
+              "      </button>\n",
+              "      \n",
+              "  <style>\n",
+              "    .colab-df-container {\n",
+              "      display:flex;\n",
+              "      flex-wrap:wrap;\n",
+              "      gap: 12px;\n",
+              "    }\n",
+              "\n",
+              "    .colab-df-convert {\n",
+              "      background-color: #E8F0FE;\n",
+              "      border: none;\n",
+              "      border-radius: 50%;\n",
+              "      cursor: pointer;\n",
+              "      display: none;\n",
+              "      fill: #1967D2;\n",
+              "      height: 32px;\n",
+              "      padding: 0 0 0 0;\n",
+              "      width: 32px;\n",
+              "    }\n",
+              "\n",
+              "    .colab-df-convert:hover {\n",
+              "      background-color: #E2EBFA;\n",
+              "      box-shadow: 0px 1px 2px rgba(60, 64, 67, 0.3), 0px 1px 3px 1px rgba(60, 64, 67, 0.15);\n",
+              "      fill: #174EA6;\n",
+              "    }\n",
+              "\n",
+              "    [theme=dark] .colab-df-convert {\n",
+              "      background-color: #3B4455;\n",
+              "      fill: #D2E3FC;\n",
+              "    }\n",
+              "\n",
+              "    [theme=dark] .colab-df-convert:hover {\n",
+              "      background-color: #434B5C;\n",
+              "      box-shadow: 0px 1px 3px 1px rgba(0, 0, 0, 0.15);\n",
+              "      filter: drop-shadow(0px 1px 2px rgba(0, 0, 0, 0.3));\n",
+              "      fill: #FFFFFF;\n",
+              "    }\n",
+              "  </style>\n",
+              "\n",
+              "      <script>\n",
+              "        const buttonEl =\n",
+              "          document.querySelector('#df-935a6d64-7007-4e70-9dee-9a7981615c70 button.colab-df-convert');\n",
+              "        buttonEl.style.display =\n",
+              "          google.colab.kernel.accessAllowed ? 'block' : 'none';\n",
+              "\n",
+              "        async function convertToInteractive(key) {\n",
+              "          const element = document.querySelector('#df-935a6d64-7007-4e70-9dee-9a7981615c70');\n",
+              "          const dataTable =\n",
+              "            await google.colab.kernel.invokeFunction('convertToInteractive',\n",
+              "                                                     [key], {});\n",
+              "          if (!dataTable) return;\n",
+              "\n",
+              "          const docLinkHtml = 'Like what you see? Visit the ' +\n",
+              "            '<a target=\"_blank\" href=https://colab.research.google.com/notebooks/data_table.ipynb>data table notebook</a>'\n",
+              "            + ' to learn more about interactive tables.';\n",
+              "          element.innerHTML = '';\n",
+              "          dataTable['output_type'] = 'display_data';\n",
+              "          await google.colab.output.renderOutput(dataTable, element);\n",
+              "          const docLink = document.createElement('div');\n",
+              "          docLink.innerHTML = docLinkHtml;\n",
+              "          element.appendChild(docLink);\n",
+              "        }\n",
+              "      </script>\n",
+              "    </div>\n",
+              "  </div>\n",
+              "  "
+            ]
+          },
+          "metadata": {},
+          "execution_count": 49
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [],
+      "metadata": {
+        "id": "tR4Qhrjne-TL"
+      },
+      "execution_count": null,
+      "outputs": []
+    }
+  ]
+}
